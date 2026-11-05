@@ -253,6 +253,10 @@
           break;
         }
         this.log(`— Turn ${this.turn} —`, 'turn');
+        if (this.turn >= RULES.restlessTurn) {
+          await this.crowdRestless();
+          if (this.arenaOver()) break;
+        }
         await this.equipPhase();
         await this.attackPhase();
       }
@@ -851,7 +855,7 @@
 
       // Furor Mortis
       const k = src.killer;
-      if (!src.hades && !src.final && k && k !== p && k.glad.alive) {
+      if (!src.hades && !src.crowd && !src.final && k && k !== p && k.glad.alive) {
         const heads = await this.flip(`Furor Mortis: ${p.name}'s revenge`);
         if (heads) {
           this.log(`😤 With their dying breath, ${p.name} strikes back at ${k.name}!`, 'crit');
@@ -861,6 +865,16 @@
         } else {
           this.log(`${p.name} boards the boat to cross into Hades.`, 'dim');
         }
+      }
+    }
+
+    /** From turn 11, at the start of each turn every living Gladiator loses 10 VITA (ignores armor, no Furor Mortis). */
+    async crowdRestless() {
+      this.log(`📣 <b>The Crowd Grows Restless!</b> Every living Gladiator loses ${RULES.restlessDmg} VITA.`, 'hit');
+      await this.io.showCard?.('crowd', { name: 'The Crowd Grows Restless', icon: '📣', text: `Every living Gladiator loses ${RULES.restlessDmg} VITA. Ignores armor.` }, { name: 'The crowd' });
+      for (const p of this.order) {
+        if (!p.glad.alive) continue;
+        await this.takeDamage(p, RULES.restlessDmg, { crowd: true });
       }
     }
 
