@@ -112,9 +112,10 @@
     /** Dodge of `t` against attacker `a` this attack. */
     dodgeVs(t, a, harena) {
       if (t.glad.key === 'bestia') return 0; // always struck, modifiers have no impact
+      if (this.noDodgePhase) return 0; // Hands in the Sand
       let d = this.ownDodge(t);
       if (t.glad.key !== 'amazonia') {
-        let red = harena ? 1 : 0;
+        let red = (harena ? 1 : 0) + (t.glad.debuff.dodgePhase || 0);
         for (const c of this.weapons(a)) {
           const wd = def(c);
           if (!wd.dodgeMod) continue;
@@ -185,7 +186,7 @@
       p.glad = {
         key: c.key, card: c, vita: g.vita, max: g.vita, alive: true,
         equipped: [], coinUsed: false, veloxUsed: false, hephUsed: false, redrawn: false,
-        debuff: { roll: 0, armor: 0 },
+        debuff: { roll: 0, miss: false, noBuy: false, haunted: false, armorPhase: 0, dodgePhase: 0, turnedBy: null },
       };
     }
 
@@ -212,6 +213,7 @@
         const g = this.gdef(p);
         const redraw = await this.ask(p, {
           title: `${p.name}: keep ${g.name}?`,
+          gladKey: p.glad.key,
           text: `${g.icon} <b>${g.name}</b> — VITA ${g.vita}, dodge ${g.dodge || 'never'}. ${g.text}<br><br>Once per arena you may send your Gladiator back and draw a new one (the returned Gladiator is discarded).`,
           options: [{ label: `Keep ${g.name}`, value: false }, { label: 'Send back & draw again', value: true }],
         }, () => this.AI.wantsRedraw(this, p));
@@ -307,8 +309,13 @@
         if (!p.glad.alive) continue;
         this.active = p;
         p.gold += RULES.income;
-        this.equipState = { player: p, refreshed: false, drawn: false, buys: 0 };
+        const db = p.glad.debuff;
+        this.equipState = { player: p, refreshed: false, drawn: false, buys: 0, noBuy: db.noBuy, haunted: db.haunted };
+        db.noBuy = false;
+        db.haunted = false;
         this.log(`${p.name} collects ${RULES.income} denarii (now ${p.gold}).`, 'dim');
+        if (this.equipState.haunted) this.log(`🌘 ${p.name} is haunted: no drawing, buying or equipping this phase.`, 'hades');
+        else if (this.equipState.noBuy) this.log(`🏚️ The Market stalls are shut for ${p.name} this phase.`, 'hades');
         this.update();
         if (p.isAI) await this.AI.equipPhase(this, p);
         else await this.io.humanEquip(p);
@@ -363,6 +370,7 @@
     actDraw(p) {
       const e = this.checkEquip(p); if (e) return e;
       const s = this.equipState;
+      if (s.haunted) return 'Haunted Dreams: you cannot draw this phase.';
       if (s.drawn) return 'You already drew this phase.';
       if (s.buys) return 'You chose to buy this phase: draw OR buy, not both.';
       const c = this.equipDeck.draw();
@@ -378,6 +386,7 @@
     actBuy(p, uid) {
       const e = this.checkEquip(p); if (e) return e;
       const s = this.equipState;
+      if (s.haunted || s.noBuy) return s.haunted ? 'Haunted Dreams: you cannot buy this phase.' : 'Stalls Shut: you cannot buy from the Market this phase.';
       if (s.drawn) return 'You drew a free card this phase: draw OR buy, not both.';
       if (s.buys >= RULES.maxBuys) return `You can buy at most ${RULES.maxBuys} cards per phase.`;
       const i = this.market.findIndex((c) => c.uid === uid);
@@ -397,6 +406,7 @@
     /** Equip from hand. If the new card conflicts, try unequipping the fewest conflicting cards. */
     actEquip(p, uid) {
       const e = this.checkEquip(p); if (e) return e;
+      if (this.equipState.haunted) return 'Haunted Dreams: you cannot equip this phase.';
       const i = p.hand.findIndex((c) => c.uid === uid);
       if (i < 0) return 'Card not in hand.';
       const card = p.hand[i];
@@ -429,6 +439,7 @@
 
     actUnequip(p, uid) {
       const e = this.checkEquip(p); if (e) return e;
+      if (this.equipState.haunted) return 'Haunted Dreams: you cannot change your gear this phase.';
       const i = p.glad.equipped.findIndex((c) => c.uid === uid);
       if (i < 0) return 'Card not equipped.';
       if (p.glad.equipped[i].locked) return "Retiarius's Rete cannot be unequipped.";
@@ -439,6 +450,7 @@
 
     /** Replace the whole loadout (used by the AI). `items` must be cards owned by p. */
     setLoadout(p, items) {
+      if (this.equipState && this.equipState.player === p && this.equipState.haunted) return 'Haunted Dreams: you cannot equip this phase.';
       const err = loadoutError(p.glad.key, items);
       if (err) return err;
       const all = [...p.hand, ...p.glad.equipped];
@@ -480,7 +492,10 @@
       }
       if (card.key === 'harena' || card.key === 'furor') return `${d.name} is declared right before you roll an attack.`;
       if (card.key === 'interceptio') return this.useInterceptio(p, card);
-      if (card.key === 'fortuna') return this.useFortuna(p, card);
+      if (card.key === 'fortuna') {
+        if (this.equipState.haunted) return 'Haunted Dreams: you cannot draw this phase.';
+        return this.useFortuna(p, card);
+      }
       return `${d.name} cannot be used like that.`;
     }
 
@@ -539,14 +554,18 @@
       this.phase = 'attack';
       this.update();
       for (const p of this.order) {
-        if (this.arenaOver()) return;
+        if (this.arenaOver()) break;
         this.active = p;
         this.update();
         if (p.glad.alive) await this.attackTurn(p);
         else await this.hadesTurn(p);
         await this.delay(350);
       }
+      // "For the rest of this Attack Phase" effects end here.
+      this.noDodgePhase = false;
+      for (const q of this.players) { q.glad.debuff.armorPhase = 0; q.glad.debuff.dodgePhase = 0; }
       this.active = null;
+      this.update();
     }
 
     neighbor(p, dir) {
@@ -558,8 +577,16 @@
       return null;
     }
 
-    async chooseTarget(p, candidates, title) {
+    async chooseTarget(p, candidates, title, chooser) {
       if (candidates.length === 1) return candidates[0];
+      if (chooser && chooser !== p) {
+        const j = await this.ask(chooser, {
+          title,
+          text: `Choose who ${p.name} attacks.`,
+          options: candidates.map((c, i) => ({ label: `${c.name} — ${this.gdef(c).name}, VITA ${c.glad.vita}`, value: i })),
+        }, () => candidates.indexOf(this.AI.pickHadesTarget(this, chooser, candidates)));
+        return candidates[j];
+      }
       const i = await this.ask(p, {
         title,
         text: 'Choose your target.',
@@ -571,12 +598,15 @@
     async attackTurn(p) {
       const others = this.living().filter((q) => q !== p);
       if (!others.length) return;
+      const turner = p.glad.debuff.turnedBy;
+      p.glad.debuff.turnedBy = null;
+      if (turner) this.log(`🔄 Turned Blade: ${turner.name} whispers from Hades and chooses ${p.name}'s target!`, 'hades');
 
       if (this.has(p, 'fulgur')) {
         let targets = others;
         if (others.length > 2) {
-          const first = await this.chooseTarget(p, others, `${p.name}: Fulgur Iovis — first target`);
-          const second = await this.chooseTarget(p, others.filter((q) => q !== first), `${p.name}: Fulgur Iovis — second target`);
+          const first = await this.chooseTarget(p, others, `Fulgur Iovis (${p.name}) — first target`, turner);
+          const second = await this.chooseTarget(p, others.filter((q) => q !== first), `Fulgur Iovis (${p.name}) — second target`, turner);
           targets = [first, second];
         } else if (this.players.length === 2) {
           targets = [others[0]];
@@ -588,15 +618,18 @@
         for (const t of targets) {
           if (!p.glad.alive && !p.glad.finalAttacking) break;
           if (!t.glad.alive) continue;
-          await this.resolveAttack(p, t, { mods, raw });
+          await this.resolveAttack(p, t, { mods, raw, keepMiss: true });
         }
         p.glad.debuff.roll = 0;
+        p.glad.debuff.miss = false;
         return;
       }
 
       let target = null;
       if (this.players.length === 2) {
         target = others[0];
+      } else if (turner) {
+        target = await this.chooseTarget(p, others, `Turned Blade: choose ${p.name}'s target`, turner);
       } else {
         const c = this.attackDeck.draw();
         const ad = ATTACK_CARDS[c.key];
@@ -656,6 +689,12 @@
 
     /** One attack from a → t. Options: mods, raw (pre-rolled, Fulgur), extra (Ensis), final (Furor Mortis). */
     async resolveAttack(a, t, opt) {
+      if (a.glad.debuff.miss) {
+        if (!opt.keepMiss) a.glad.debuff.miss = false;
+        this.log(`💨 Stolen Breath: ${a.name}'s attack on ${t.name} automatically misses.`, 'miss');
+        this.update();
+        return { hit: false };
+      }
       const mods = opt.mods || (opt.final ? { harena: false, furor: false } : await this.preAttackMods(a, [t]));
       let raw = opt.raw;
       if (raw == null) {
@@ -683,13 +722,11 @@
       const rollText = r.mod !== raw ? `${raw}→${r.mod}` : `${raw}`;
       if (!r.hit) {
         this.log(`${a.name} rolls ${rollText} against ${t.name}'s dodge ${r.dodge}: <b>miss</b>.`, 'miss');
-        t.glad.debuff.armor = 0;
         this.update();
         return { hit: false };
       }
 
       let dmg = this.computeDamage(a, t, r.auto);
-      t.glad.debuff.armor = 0;
       this.log(`${a.name} rolls ${rollText} against ${t.name}'s dodge ${r.dodge}: <b>${r.auto ? 'AUTO-HIT' : 'hit'}</b> for <b>${dmg.total}</b> damage${dmg.detail ? ` (${dmg.detail})` : ''}.`, r.auto ? 'crit' : 'hit');
       let total = dmg.total;
 
@@ -756,7 +793,7 @@
         parts.push('armor ignored');
         return { total, detail: parts.join(', ') };
       }
-      const armor = Math.max(0, this.totalDef(t) - (t.glad.debuff.armor || 0));
+      const armor = Math.max(0, this.totalDef(t) - (t.glad.debuff.armorPhase || 0));
       let eff = Math.max(0, armor - pierce);
       if (half) eff = ceil5(eff / 2);
       if (armor) parts.push(`armor ${armor}${eff !== armor ? `→${eff}` : ''}`);
@@ -830,26 +867,33 @@
       const h = HADES[c.key];
       this.lastHadesCard = c;
       this.hadesDeck.toDiscard(c);
-      this.log(`👻 ${p.name} draws from Hades: <b>${h.icon} ${h.name}</b>.`, 'hades');
+      this.log(`👻 ${p.name} draws from Hades: <b>${h.icon} ${h.name}</b>. <i>${h.flavor}</i>`, 'hades');
       await this.io.showCard('hades', h, p);
-      if (h.kind === 'watch') { this.log(h.text, 'dim'); return; }
-      const living = this.living();
-      if (!living.length) return;
-      if (h.all) {
-        const heads = await this.flip(`${h.name}`);
-        if (!heads) { this.log('The underworld stirs, but nothing happens.', 'dim'); return; }
-        for (const t of living) {
-          if (this.living().length === 0) break;
-          await this.applyHades(p, t, h);
+      if (h.kind === 'watch') { this.log('No effect.', 'dim'); return; }
+      if (!this.living().length) return;
+      if (h.coin) {
+        const heads = await this.flip(h.name);
+        if (!heads) { this.log('Tails: the underworld stirs, but nothing happens.', 'dim'); return; }
+      }
+      if (h.target === 'global') {
+        if (h.effect === 'noDodge') {
+          this.noDodgePhase = true;
+          this.log('🙌 Cold hands grip every ankle: no living Gladiator can dodge for the rest of this Attack Phase!', 'hit');
         }
+        this.update();
         return;
       }
-      const t = await this.chooseTarget(p, living, `${p.name} (Hades): ${h.name}`);
+      if (h.target === 'all') {
+        for (const t of this.living()) await this.applyHades(p, t, h);
+        return;
+      }
+      const t = await this.chooseTarget(p, this.living(), `${p.name} (Hades): ${h.name}`, p);
       await this.applyHades(p, t, h);
     }
 
     async applyHades(p, t, h) {
       if (!t.glad.alive) return;
+      const db = t.glad.debuff;
       switch (h.effect) {
         case 'dmg':
           this.log(`👻 ${t.name} takes ${h.amount} damage from Hades.`, 'hit');
@@ -858,32 +902,72 @@
         case 'toll': {
           const pay = Math.min(t.gold, h.amount);
           t.gold -= pay;
-          this.log(`👻 ${t.name} pays ${pay} denarii to Hades.`);
+          this.log(`👻 ${t.name} pays ${pay} denarii to the Bank.`);
           break;
         }
-        case 'discard':
+        case 'discard': {
+          if (!t.hand.length) { this.log(`👻 ${t.name}'s hand is empty: no effect.`, 'dim'); break; }
+          const i = await this.ask(t, {
+            title: `${t.name}: ${h.name}`,
+            text: 'Discard 1 card of your choice from your hand.',
+            cards: t.hand,
+            options: t.hand.map((c, k) => ({ label: `Discard ${def(c).name}`, value: k })),
+          }, () => this.AI.pickDiscard(this, t));
+          const c = t.hand[i] || t.hand[0];
+          this.discardFromHand(t, c.uid);
+          this.log(`👻 ${t.name} discards ${def(c).name}.`);
+          break;
+        }
+        case 'discardHand':
           if (t.hand.length) {
-            const c = t.hand[Math.floor(this.rng() * t.hand.length)];
-            this.discardFromHand(t, c.uid);
-            this.log(`👻 ${t.name} loses ${def(c).name} from their hand.`);
-          } else this.log(`👻 ${t.name}'s hand is empty: no effect.`, 'dim');
+            const n = t.hand.length;
+            for (const c of t.hand) this.equipDeck.toDiscard(c);
+            t.hand = [];
+            this.log(`👻 ${t.name} drops their whole hand (${n} card${n > 1 ? 's' : ''}).`);
+          }
           break;
         case 'weak':
-          t.glad.debuff.roll = 1;
+          db.roll = 1;
           this.log(`👻 ${t.name}'s next hit roll is reduced by 1.`);
           break;
-        case 'rust':
-          t.glad.debuff.armor = h.amount;
-          this.log(`👻 ${t.name}'s armor counts ${h.amount} less against the next attack.`);
+        case 'noBuy':
+          db.noBuy = true;
+          this.log(`👻 ${t.name} cannot buy from the Market in their next Equip Phase.`);
           break;
-        case 'loseWeapon': {
-          const ws = t.glad.equipped.filter((c) => def(c).type === 'weapon' && !c.locked);
-          if (ws.length) {
-            const c = ws[Math.floor(this.rng() * ws.length)];
-            t.glad.equipped = t.glad.equipped.filter((x) => x !== c);
-            this.equipDeck.toDiscard(c);
-            this.log(`👻 ${t.name}'s ${def(c).name} is dragged into the underworld!`, 'hit');
-          } else this.log(`👻 ${t.name} has no weapon to lose.`, 'dim');
+        case 'haunted':
+          db.haunted = true;
+          this.log(`👻 ${t.name} cannot draw, buy or equip in their next Equip Phase.`);
+          break;
+        case 'armorDown':
+          db.armorPhase = (db.armorPhase || 0) + h.amount;
+          this.log(`👻 ${t.name} has ${h.amount} less armor for the rest of this Attack Phase.`);
+          break;
+        case 'dodgeDown':
+          db.dodgePhase = (db.dodgePhase || 0) + 1;
+          this.log(`👻 ${t.name}'s dodge is reduced by 1 for the rest of this Attack Phase.`);
+          break;
+        case 'miss':
+          db.miss = true;
+          this.log(`👻 ${t.name}'s next attack will automatically miss.`);
+          break;
+        case 'turned':
+          db.turnedBy = p;
+          this.log(`👻 ${p.name} will choose the target of ${t.name}'s next attack.`);
+          break;
+        case 'loseWeapon':
+        case 'loseItem': {
+          const pool = t.glad.equipped.filter((c) => !c.locked && (h.effect === 'loseItem' || def(c).type === 'weapon'));
+          if (!pool.length) { this.log(`👻 ${t.name} has nothing to lose.`, 'dim'); break; }
+          const i = pool.length === 1 ? 0 : await this.ask(t, {
+            title: `${t.name}: ${h.name}`,
+            text: `Discard 1 equipped ${h.effect === 'loseWeapon' ? 'weapon' : 'item'} of your choice. No refund.`,
+            cards: pool,
+            options: pool.map((c, k) => ({ label: `Lose ${def(c).name}`, value: k })),
+          }, () => this.AI.pickLoseEquipped(this, t, pool));
+          const c = pool[i] || pool[0];
+          t.glad.equipped = t.glad.equipped.filter((x) => x !== c);
+          this.equipDeck.toDiscard(c);
+          this.log(`👻 ${t.name}'s ${def(c).name} is swallowed by the sand!`, 'hit');
           break;
         }
       }

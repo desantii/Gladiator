@@ -126,8 +126,14 @@
         }
         return pick;
       };
-      let pick = tryBuy();
-      if (!pick && p.gold >= 70 && game.rng() < 0.4) {
+      const st = game.equipState;
+      if (st.haunted) {
+        game.log(`${p.name} cannot bring themselves to touch their gear.`, 'dim');
+        await pause();
+        return;
+      }
+      let pick = st.noBuy ? null : tryBuy();
+      if (!pick && !st.noBuy && p.gold >= 70 && game.rng() < 0.4) {
         if (!game.actRefresh(p)) { await pause(); pick = tryBuy(); }
       }
       if (pick) {
@@ -149,6 +155,26 @@
       const names = p.glad.equipped.map((c) => def(c).name);
       game.log(`${p.name} equips: ${names.length ? names.join(', ') : 'nothing (fists)'}.`, 'dim');
       await pause();
+    },
+
+    /** A shade in Hades picks a living Gladiator to torment: the leader, then the healthiest. */
+    pickHadesTarget(game, p, cands) {
+      let best = cands[0], bs = -Infinity;
+      for (const c of cands) {
+        const s = c.laurels * 100 + c.glad.vita + c.gold * 0.3;
+        if (s > bs) { bs = s; best = c; }
+      }
+      return best;
+    },
+
+    pickLoseEquipped(game, p, pool) {
+      let bi = 0, bs = -Infinity;
+      pool.forEach((c, i) => {
+        const rest = p.glad.equipped.filter((x) => x !== c);
+        const s = score(p.glad.key, rest);
+        if (s > bs) { bs = s; bi = i; }
+      });
+      return bi;
     },
 
     pickTarget(game, p, cands) {

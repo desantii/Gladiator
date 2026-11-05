@@ -25,14 +25,20 @@ Open `index.html` in any modern browser. There's nothing to install or build.
 
 Run the simulation with `node tests/simulate.js 300`.
 
+## Sources
+
+- Rules: v6.1 manual ([`docs/rules-v6.1.md`](docs/rules-v6.1.md)).
+- Card counts and texts: v6 print sheets, including the 30 unique Hades cards and the Attack deck split (9 Left, 9 Right, 6 Your Choice, 6 Pass).
+- Card art: none yet. Each card shows an emoji in its art box. To add art, map card keys to image paths in `window.GLAD_ART`, e.g. `{ pugio: 'art/pugio.png' }`, loaded before `js/data.js`.
+
 ## Interpretations
 
-The manual leaves a few details open. This version assumes:
+The rules leave a few details open. This version assumes:
 
-- **Attack deck (30):** 9 Attack Left, 9 Attack Right, 8 Attack Your Choice, 4 Pass. "Left" is the next seat; dead Gladiators are skipped.
-- **Hades deck (30):** 10 Watch. 10 Minor (*Whisper from Below*), 2 each of: 5 damage, 5-denarii toll, lose a random hand card, next hit roll −1, armor −20 against the next attack. 10 Major (*Wrath of the Dead*): 10 damage ×2, 20-denarii toll ×2, and lose an equipped weapon ×1, each on one target; plus, on a Sacred Coin Heads, 10 damage to every living Gladiator ×3 or a 10-denarii toll on every living Gladiator ×2. The dead player picks single targets.
 - **Armor piercing:** Pilum and Sica stack and apply to the whole attack. Clava then halves the remaining armor. Leo, Canis and Cerberus damage ignores armor entirely.
 - **Auto-hit reductions:** Lorica Squamata (−10), Lorica Segmentata (−20) and Ursus (−10) reduce auto-hit damage, to a minimum of 5.
 - A Gladiator whose only weapon is a Rete still punches for 10.
 - The 1-Legendary limit applies to equipped items.
+- "Left" is the next seat; dead Gladiators are skipped. When a single-target Hades card is drawn, the dead player chooses the living target.
+- **Haunted Dreams** also blocks unequipping and playing Fortuna. **Turned Blade** lasts until that Gladiator's next attack, and overrides a Pass. **Weak Knees** is a dodge reduction, so it doesn't affect Amazonia. The Retiarius' locked Rete can't be lost to Hades either.
 - Healing (Aqua Vitae, Volumen Medici) can be used during your Equip Phase, from your hand at any time, and is offered after you take damage.

@@ -1,7 +1,7 @@
 /* Gladiator v6.1 — browser UI. */
 (function () {
   'use strict';
-  const { CARDS, GLADIATORS, RULES } = window.GLAD_DATA;
+  const { CARDS, GLADIATORS, RULES, ART } = window.GLAD_DATA;
   const { Game } = window.GladiatorEngine;
   const def = (c) => CARDS[c.key];
   const $ = (id) => document.getElementById(id);
@@ -36,18 +36,44 @@
   function tooltip(d) {
     return `${d.name} (${d.en}) — ${statLine(d)}. ${d.text}${d.buy ? ` Buy ${d.buy}.` : ' Draw only.'} Sell ${d.sell}.`;
   }
+  const TIMING = { aqua: 'ANY TIME', volumen: 'ANY TIME', harena: 'BEFORE ATTACK', furor: 'BEFORE ATTACK', interceptio: 'EQUIP PHASE', fortuna: 'EQUIP PHASE' };
+  const LOC = { off: 'OFF HAND', body: 'BODY', head: 'HEAD', arm: 'ARM', legs: 'LEGS' };
+  function typeLine(d, key) {
+    const leg = d.legendary ? 'LEGENDARY · ' : '';
+    if (d.type === 'weapon') return `${leg}WEAPON · ${d.hands === 2 ? 'TWO' : 'ONE'} HANDED`;
+    if (d.type === 'armor') return `${leg}ARMOR · ${LOC[d.loc]}`;
+    if (d.type === 'relic') return 'LEGENDARY · NO SLOT';
+    return `SPECIAL · ${TIMING[key] || ''} · ONE USE`;
+  }
+  function footRight(d) {
+    if (d.type === 'weapon') return d.beast ? `ATK Dx${d.beast}` : `ATK ${d.atk}`;
+    if (d.type === 'armor') return `DEF ${d.def}`;
+    if (d.type === 'relic') return '—';
+    return 'DRAW ONLY';
+  }
+  function artHTML(key, icon) {
+    const src = ART && ART[key];
+    return `<div class="c-art">${src ? `<img src="${esc(src)}" alt="">` : `<span>${icon}</span>`}</div>`;
+  }
+  /** Card face laid out like the v6 print sheets. */
+  function faceHTML(o) {
+    return `
+      <div class="c-type">${o.type}</div>
+      <div class="c-title"><span class="c-name">${esc(o.name)}</span>${o.count ? `<span class="c-count">×${o.count}</span>` : ''}</div>
+      ${o.sub ? `<div class="c-en">(${esc(o.sub)})</div>` : ''}
+      ${artHTML(o.key, o.icon)}
+      <div class="c-text">${esc(o.text)}${o.flavor ? `<div class="c-flavor">${esc(o.flavor)}</div>` : ''}</div>
+      ${o.footL || o.footR ? `<div class="c-foot"><span>${o.footL || ''}</span><b>${o.footR || ''}</b></div>` : ''}`;
+  }
   function cardEl(c, actions, extraClass) {
     const d = def(c);
     const el = document.createElement('div');
     el.className = `card cat-${d.cat}${extraClass ? ' ' + extraClass : ''}`;
     el.title = tooltip(d);
-    el.innerHTML = `
-      <span class="c-cat">${d.cat}</span>
-      <div class="c-top"><span class="c-icon">${d.icon}</span><span class="c-name">${esc(d.name)}</span></div>
-      <div class="c-en">${esc(d.en)}</div>
-      <div class="c-stats">${statLine(d)}</div>
-      <div class="c-text">${esc(d.text)}</div>
-      <div class="c-price">${d.buy ? `Buy ${d.buy} · ` : 'Draw only · '}Sell ${d.sell}${c.locked ? ' · 🔒 locked' : ''}</div>`;
+    el.innerHTML = faceHTML({
+      type: typeLine(d, c.key), name: d.name, sub: d.en, count: d.count, key: c.key, icon: d.icon, text: d.text,
+      footL: `${d.buy ? `BUY ${d.buy} · ` : ''}SELL ${d.sell}${c.locked ? ' · 🔒' : ''}`, footR: footRight(d),
+    });
     if (actions && actions.length) {
       const row = document.createElement('div');
       row.className = 'c-actions';
@@ -63,6 +89,10 @@
       el.appendChild(row);
     }
     return el;
+  }
+  function gladCardHTML(key) {
+    const g = GLADIATORS[key];
+    return `<div class="card cat-gladiator">${faceHTML({ type: 'GLADIATOR', name: g.name, count: g.count, key, icon: g.icon, text: g.text, footL: `DODGE ${g.dodge || 'NEVER'}`, footR: `VITA ${g.vita}` })}</div>`;
   }
 
   // ------------------------------------------------------------ helpers
@@ -91,13 +121,12 @@
   }
   function closeModal() { $('modal').classList.add('hidden'); $('modal-box').innerHTML = ''; }
 
-  function modalChoice(title, text, options, cards) {
+  function modalChoice(title, text, options, cards, gladKey) {
     return new Promise((resolve) => {
       const box = openModal(`<h2>${title}</h2><div class="mtext">${text || ''}</div><div class="mcards"></div><div class="mopts"></div>`);
-      if (cards && cards.length) {
-        const mc = box.querySelector('.mcards');
-        for (const c of cards) mc.appendChild(cardEl(c));
-      }
+      const mc = box.querySelector('.mcards');
+      if (cards && cards.length) for (const c of cards) mc.appendChild(cardEl(c));
+      if (gladKey) mc.innerHTML += gladCardHTML(gladKey);
       const mo = box.querySelector('.mopts');
       options.forEach((o, i) => {
         const b = document.createElement('button');
@@ -130,7 +159,7 @@
         if (!live()) return never();
         if (humans().length > 1 && state.viewer !== p) { state.viewer = p; }
         render();
-        const v = await modalChoice(esc(q.title), q.text, q.options, q.cards);
+        const v = await modalChoice(esc(q.title), q.text, q.options, q.cards, q.gladKey);
         return live() ? v : never();
       },
       async humanEquip(p) {
@@ -156,8 +185,10 @@
       },
       async showCard(kind, d, p) {
         if (!live()) return never();
-        stage(`<div><div class="big">${d.icon}</div><div class="lbl">${esc(d.name)}</div><div class="why">${esc(p.name)} · ${kind === 'hades' ? 'Hades card' : 'Attack card'}</div></div>`);
-        await wait(700 * state.speed);
+        const key = Object.keys(kind === 'hades' ? window.GLAD_DATA.HADES : window.GLAD_DATA.ATTACK_CARDS).find((k) => (kind === 'hades' ? window.GLAD_DATA.HADES : window.GLAD_DATA.ATTACK_CARDS)[k] === d);
+        const type = kind === 'hades' ? `HADES · ${d.kind.toUpperCase()}${d.coin ? ' · COIN FLIP' : ''}` : 'ATTACK';
+        stage(`<div><div class="card stage-card cat-${kind}">${faceHTML({ type, name: d.name, key: (kind === 'hades' ? 'hades-' : 'attack-') + key, icon: d.icon, text: d.text, flavor: d.flavor })}</div><div class="why">${esc(p.name)}${kind === 'hades' ? ' · from Hades' : ''}</div></div>`);
+        await wait((kind === 'hades' ? 1400 : 700) * state.speed);
       },
       async arenaEnd(game) {
         if (!live()) return never();
@@ -197,7 +228,7 @@
   function renderStatus(g) {
     const phase = { setup: 'Setup', equip: 'Equip Phase', attack: 'Attack Phase', arenaEnd: 'Arena over', over: 'Game over' }[g.phase] || '';
     const who = g.active ? ` · <b>${esc(g.active.name)}</b>${g.phase === 'attack' && g.active.glad && !g.active.glad.alive ? ' (Hades)' : ''}` : '';
-    $('status').innerHTML = `Arena <b>${g.arena}</b> · Turn <b>${g.turn}</b> · ${phase}${who}`;
+    $('status').innerHTML = `Arena <b>${g.arena}</b> · Turn <b>${g.turn}</b> · ${phase}${who}${g.noDodgePhase ? ' · <span style="color:#ff9d8c">🙌 Hands in the Sand: nobody can dodge</span>' : ''}`;
   }
 
   function renderPlayers(g) {
@@ -216,9 +247,15 @@
       badges.push(`<span class="badge${gl.coinUsed ? ' used' : ''}" title="The Emperor's Favor: the first time your Gladiator reaches 0 VITA, flip the Sacred Coin (Heads: revive with 30 VITA).">🪙 Emperor's Favor</span>`);
       if (gl.key === 'velox') badges.push(`<span class="badge${gl.veloxUsed ? ' used' : ''}">💨 Reroll</span>`);
       if (g.has(p, 'hephaesti')) badges.push(`<span class="badge${gl.hephUsed ? ' used' : ''}">🔨 Negate hit</span>`);
-      if (gl.debuff.roll) badges.push('<span class="badge warn">Next roll −1</span>');
-      if (gl.debuff.armor) badges.push(`<span class="badge warn">Armor −${gl.debuff.armor}</span>`);
-      const dodge = gl.key === 'bestia' ? 'never' : g.ownDodge(p);
+      const db = gl.debuff;
+      if (db.roll) badges.push('<span class="badge warn" title="A Familiar Face">Next roll −1</span>');
+      if (db.miss) badges.push('<span class="badge warn" title="Stolen Breath">Next attack misses</span>');
+      if (db.armorPhase) badges.push(`<span class="badge warn" title="Rotten Straps">Armor −${db.armorPhase}</span>`);
+      if (db.dodgePhase) badges.push(`<span class="badge warn" title="Weak Knees">Dodge −${db.dodgePhase}</span>`);
+      if (db.noBuy) badges.push('<span class="badge warn" title="Stalls Shut">No buying next phase</span>');
+      if (db.haunted) badges.push('<span class="badge warn" title="Haunted Dreams">Haunted next phase</span>');
+      if (db.turnedBy) badges.push(`<span class="badge warn" title="Turned Blade">${esc(db.turnedBy.name)} picks next target</span>`);
+      const dodge = gl.key === 'bestia' || g.noDodgePhase ? 'never' : Math.max(1, g.ownDodge(p) - (gl.key === 'amazonia' ? 0 : gl.debuff.dodgePhase || 0));
       el.innerHTML = `
         <div class="pp-head"><span class="pp-name">${esc(p.name)}${p.isAI ? '<span class="tag">AI</span>' : ''}</span><span class="laurels" title="${p.laurels} laurels">${laurelHTML(p.laurels, g.laurelsToWin)}</span></div>
         <div class="pp-glad" title="${esc(gd.text)}">${gd.icon} ${gd.name} <span class="ab">— ${esc(gd.text)}</span></div>
@@ -418,7 +455,11 @@
       <table><tr><th>Card</th><th>Stats</th><th>Buy/Sell</th><th>Effect</th></tr>
       ${Object.values(CARDS).map((d) => `<tr><td>${d.icon} ${d.name}</td><td>${statLine(d)}</td><td>${d.buy || '—'}/${d.sell}</td><td>${esc(d.text)}</td></tr>`).join('')}</table>
       <h4>Notes on this digital edition</h4>
-      <p>Where the manual leaves details open, this version assumes: Attack deck = 9 Left, 9 Right, 8 Choice, 4 Pass. Hades Minor and Major cards use the effects the manual lists (split shown in the log). Armor-piercing and Clava effects apply to the attack as a whole. A Gladiator with only a Rete still punches for 10. "Left" is the next seat clockwise (skipping the dead).</p>
+      <p>Card counts and texts follow the v6 card sheets (Attack deck: 9 Left, 9 Right, 6 Your Choice, 6 Pass; 30 unique Hades cards). Where the rules leave details open, this version assumes: armor-piercing and Clava effects apply to the attack as a whole; a Gladiator whose only weapon is a Rete still punches for 10; "Left" is the next seat clockwise (skipping the dead); Haunted Dreams also blocks unequipping and Fortuna.</p>
+      <h4>Hades deck</h4>
+      <table><tr><th>Card</th><th>Type</th><th>Effect</th></tr>
+      ${Object.values(window.GLAD_DATA.HADES).filter((h) => h.kind !== 'watch').map((h) => `<tr><td>${h.icon} ${h.name}</td><td>${h.kind}</td><td>${esc(h.text)}</td></tr>`).join('')}
+      <tr><td>👁️ 10 Watch cards</td><td>watch</td><td>No effect.</td></tr></table>
       </div>
       <div class="mopts" style="margin-top:14px"><button class="btn" id="rules-close">Close</button></div>`, true);
     box.querySelector('#rules-close').onclick = () => { closeModal(); if (back) back(); };
