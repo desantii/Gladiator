@@ -267,7 +267,7 @@
       if (tb && tb.winner) {
         const w = tb.winner;
         w.laurels += 1;
-        this.log(`🌿 ${tb.why}, but <b>${w.name}</b> had the most VITA before the final blows and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
+        this.log(`🌿 ${tb.why}, but <b>${w.name}</b> ${tb.note} and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
         if (w.laurels >= this.laurelsToWin) this.champion = w;
       } else if (alive.length === 1 && this.turn <= this.maxTurns) {
         const w = alive[0];
@@ -275,7 +275,7 @@
         this.log(`🌿 <b>${w.name}</b> is the last Gladiator standing and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
         if (w.laurels >= this.laurelsToWin) this.champion = w;
       } else if (alive.length === 0) {
-        this.log(`No Gladiator is left standing${tb && tb.tie ? ' and their VITA before the final blows was tied' : ''}. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
+        this.log(`No Gladiator is left standing${tb && tb.tie ? ' and their VITA before the volley was tied' : ''}. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
       }
       this.phase = 'arenaEnd';
       this.active = null;
@@ -867,16 +867,11 @@
         const heads = await this.flip(`Furor Mortis: ${p.name}'s revenge`);
         if (heads) {
           this.log(`😤 With their dying breath, ${p.name} strikes back at ${k.name}!`, 'crit');
-          const victimVita = g.vitaBeforeHit;
-          const killerVita = k.glad.vita;
           g.finalAttacking = true;
           await this.resolveAttack(p, k, { final: true });
           g.finalAttacking = false;
-          // If the revenge leaves nobody standing, the one with more VITA before their fatal blow wins.
-          if (!this.living().length) {
-            if (victimVita === killerVita) this.tiebreak = { tie: true };
-            else this.tiebreak = { winner: victimVita > killerVita ? p : k, why: `${p.name} and ${k.name} took each other down` };
-          }
+          // If the revenge fells the last Gladiator standing, the killer still wins: they outlived their opponent.
+          if (!this.living().length) this.tiebreak = { winner: k, why: `${p.name}'s revenge fells ${k.name}`, note: 'outlived their opponent' };
         } else {
           this.log(`${p.name} boards the boat to cross into Hades.`, 'dim');
         }
@@ -887,18 +882,25 @@
      *  Ignores armor, no Furor Mortis, the Sacred Coin applies. If the stones eliminate everyone at once,
      *  the Gladiator with the most VITA before the stones wins; a tie means no laurel. */
     async crowdRestless() {
-      const text = `The crowd is bored and starts hurling stones into the arena. Every living Gladiator loses ${RULES.restlessDmg} VITA. Ignores armor.`;
-      this.log(`🪨 <b>The Crowd Grows Restless!</b> ${text}`, 'hit');
-      await this.io.showCard?.('crowd', { name: 'The Crowd Grows Restless', icon: '🪨', text }, { name: 'The crowd' });
+      const archers = this.turn === RULES.archerTurn;
+      const dmg = archers ? RULES.archerDmg : RULES.restlessDmg;
+      const name = archers ? "The Emperor's Archers" : 'The Crowd Grows Restless';
+      const text = archers
+        ? `The Emperor loses patience and orders his archers to fire. Every living Gladiator loses ${dmg} VITA. Ignores armor.`
+        : `The crowd is bored and starts hurling stones into the arena. Every living Gladiator loses ${dmg} VITA. Ignores armor.`;
+      this.log(`${archers ? '🏹' : '🪨'} <b>${name}!</b> ${text}`, 'hit');
+      await this.io.showCard?.('crowd', { name, icon: archers ? '🏹' : '🪨', text }, { name: 'The crowd' });
       const before = this.order.filter((p) => p.glad.alive).map((p) => ({ p, vita: p.glad.vita }));
       for (const { p } of before) {
         if (!p.glad.alive) continue;
-        await this.takeDamage(p, RULES.restlessDmg, { crowd: true });
+        await this.takeDamage(p, dmg, { crowd: true });
       }
       if (before.length && !this.living().length) {
         const top = Math.max(...before.map((b) => b.vita));
         const leaders = before.filter((b) => b.vita === top);
-        this.tiebreak = leaders.length === 1 ? { winner: leaders[0].p, why: 'The stones fell everyone' } : { tie: true };
+        this.tiebreak = leaders.length === 1
+          ? { winner: leaders[0].p, why: archers ? 'The arrows fell everyone' : 'The stones fell everyone', note: 'had the most VITA before the volley' }
+          : { tie: true };
       }
     }
 

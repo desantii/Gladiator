@@ -158,6 +158,8 @@
     reviveVita: 30,
     restlessTurn: 11, // The Crowd Grows Restless
     restlessDmg: 10,
+    archerTurn: 15, // the Emperor's archers fire once
+    archerDmg: 30,
     laurelsToWin: 3,
     dodgeMin: 1,
     dodgeMax: 4,
