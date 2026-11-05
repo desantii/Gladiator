@@ -403,7 +403,8 @@
     const box = openModal(`
       <h2>⚔️ Gladiator</h2>
       <div class="mtext">Command your Gladiator, equip weapons and armor, and be the last one standing. Win <b>3 arenas</b> to be crowned Champion.</div>
-      <div class="mtext"><label>Players <select id="su-n">${[2, 3, 4, 5, 6].map((k) => `<option ${k === n ? 'selected' : ''}>${k}</option>`).join('')}</select></label></div>
+      <div class="mtext"><label>Players <select id="su-n">${[2, 3, 4, 5, 6].map((k) => `<option ${k === n ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
+        &nbsp; <label>Laurels to win <select id="su-l"><option value="3" selected>3 (standard)</option><option value="2">2 (shorter)</option><option value="1">1 (single arena)</option></select></label></div>
       <div id="su-rows"></div>
       <div class="mopts" style="flex-direction:row;gap:8px;margin-top:14px;flex-wrap:wrap">
         <button class="btn" id="su-go">Enter the arena</button>
@@ -432,8 +433,9 @@
         name: r.querySelector('input').value.trim() || `Player ${i + 1}`,
         ai: r.querySelector('select').value === 'ai',
       }));
+      const laurels = +box.querySelector('#su-l').value;
       closeModal();
-      startGame(players);
+      startGame(players, laurels);
     };
   }
 
@@ -469,7 +471,7 @@
   }
 
   // ------------------------------------------------------------ game start
-  function startGame(players) {
+  function startGame(players, laurelsToWin) {
     state.gen += 1;
     state.viewer = null;
     state.equipResolve = null;
@@ -477,7 +479,7 @@
     $('log').innerHTML = '';
     stage('<div class="stage-inner">The crowd roars…</div>');
     const io = makeIO(state.gen);
-    const g = new Game({ players }, io);
+    const g = new Game({ players, laurelsToWin: laurelsToWin || 3 }, io);
     state.game = g;
     const gen = state.gen;
     render();

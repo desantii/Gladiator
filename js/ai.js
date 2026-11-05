@@ -9,32 +9,61 @@
     return d.atk || 0;
   }
 
-  /** Rough worth of a loadout for gladiator key `gkey`. */
-  function score(gkey, items) {
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+
+  /** Expected damage of one attack by (aKey, aItems) on (tKey, tItems). Uses only public info. */
+  function expAttack(aKey, aItems, tKey, tItems) {
+    const ws = aItems.map(def).filter((d) => d.type === 'weapon');
+    const td = tItems.map(def);
+    let normal = 0, ignore = 0, pierce = 0, half = false, ursus = false, hasta = false, red = 0;
+    for (const w of ws) {
+      const v = w.beast ? 3.5 * w.beast : w.atk;
+      if (w.ignoreArmor) ignore += v; else normal += v;
+      pierce += w.pierce || 0;
+      if (w.halfArmor) half = true;
+      if (w.autoReduceOwn) ursus = true;
+      if (w.autoOn) hasta = true;
+      if (w.dodgeMod && !(w.isRete && td.some((d) => d.ignoresRete))) red += w.dodgeMod;
+    }
+    if (ws.every((w) => !w.beast && !w.atk)) normal += RULES.fists;
+    if (aKey === 'bestia') normal += 10;
+    const armor = td.reduce((s, d) => s + (d.type === 'armor' ? d.def : 0), 0);
+    let eff = Math.max(0, armor - pierce);
+    if (half) eff = Math.ceil(eff / 10) * 5;
+    const regular = Math.max(5, normal - eff + ignore);
+    const autoRed = td.reduce((s, d) => s + (d.autoReduce || 0), 0) + (ursus ? 10 : 0);
+    const auto = Math.max(5, normal + ignore - autoRed);
+    let dodge = 0;
+    if (tKey !== 'bestia') {
+      dodge = clamp(GLADIATORS[tKey].dodge + (td.some((d) => d.dodgeBonus) ? 2 : 0), 1, 4);
+      if (tKey !== 'amazonia') dodge = clamp(dodge - red, 1, 4);
+    }
+    const autoOn = hasta ? 5 : 6;
+    const pAuto = (7 - autoOn) / 6;
+    const pReg = Math.max(0, autoOn - 1 - dodge) / 6;
+    let e = pAuto * auto + pReg * regular;
+    if (ws.some((w) => w.extra)) e *= 1 + (pAuto + pReg) * 0.8;
+    if (ws.some((w) => w.name === 'Flagrum')) e += 3;
+    if (td.some((d) => d.negate)) e *= 0.9;
+    return e;
+  }
+
+  const DUMMY = [{ key: 'vulgaris', items: [{ key: 'gladius' }, { key: 'subarmalis' }, { key: 'cassis' }] }];
+
+  /** Worth of a loadout for p: expected damage dealt to the living opponents minus expected damage taken from them. */
+  function score(game, p, items) {
+    let opps = game.living().filter((q) => q !== p).map((q) => ({ key: q.glad.key, items: q.glad.equipped }));
+    if (!opps.length) opps = DUMMY;
+    let dealt = 0, taken = 0;
+    for (const o of opps) {
+      dealt += expAttack(p.glad.key, items, o.key, o.items);
+      taken += expAttack(o.key, o.items.length ? o.items : DUMMY[0].items, p.glad.key, items);
+    }
+    dealt /= opps.length;
+    taken /= opps.length;
     const ds = items.map(def);
-    const ws = ds.filter((d) => d.type === 'weapon');
-    let atk = ws.reduce((s, d) => s + avgAtk(d), 0);
-    if (!ws.some((d) => avgAtk(d) > 0)) atk += RULES.fists;
-    if (gkey === 'bestia') atk += 10;
-    let bonus = 0;
-    for (const d of ws) {
-      if (d.pierce) bonus += d.pierce * 0.6;
-      if (d.halfArmor) bonus += 12;
-      if (d.ignoreArmor) bonus += avgAtk(d) * 0.35;
-      if (d.multi) atk *= 1.6;
-      if (d.extra) atk *= 1.3;
-      if (d.autoOn) atk *= 1.12;
-      if (d.name === 'Flagrum') bonus += 4;
-    }
-    const red = ws.reduce((s, d) => s + (d.dodgeMod || 0), 0);
-    const oppDodge = Math.max(1, 2 - red); // typical opponent dodge
-    const hitP = (6 - oppDodge) / 6;
-    let defense = 0;
-    for (const d of ds) {
-      if (d.type === 'armor') defense += d.def * 0.9 + (d.autoReduce || 0) * 0.3 + (d.negate ? 25 : 0);
-      if (d.dodgeBonus && gkey !== 'bestia') defense += 28;
-    }
-    return atk * hitP + bonus + defense;
+    if (ds.some((d) => d.multi) && opps.length >= 2) dealt *= 1.8;
+    return dealt * 1.1 - taken;
   }
 
   /** Best legal loadout from everything the player owns. */
@@ -44,7 +73,7 @@
     const locked = p.glad.equipped.filter((c) => c.locked);
     const owned = [...p.hand, ...p.glad.equipped, ...(extra ? [extra] : [])].filter((c) => !c.locked && E.isGear(def(c)));
     const legs = owned.filter((c) => def(c).legendary);
-    let best = { items: locked.slice(), score: score(gkey, locked) };
+    let best = { items: locked.slice(), score: score(game, p, locked) };
     for (const leg of [null, ...legs]) {
       const pool = owned.filter((c) => !def(c).legendary || c === leg);
       const weapons = pool.filter((c) => def(c).type === 'weapon');
@@ -59,13 +88,18 @@
         for (const sh of [null, ...shields]) {
           let items = [...locked, ...combo, ...(sh ? [sh] : []), ...relics];
           if (E.loadoutError(gkey, items)) continue;
+          let cur = score(game, p, items);
           for (const loc of ['head', 'body', 'arm', 'legs']) {
-            const opts = pool.filter((c) => def(c).loc === loc).sort((x, y) => def(y).def - def(x).def + (def(y).negate ? 30 : 0) - (def(x).negate ? 30 : 0));
-            for (const o of opts) {
-              if (!E.loadoutError(gkey, [...items, o])) { items = [...items, o]; break; }
+            let pick = null;
+            for (const o of pool.filter((c) => def(c).loc === loc)) {
+              const next = [...items, o];
+              if (E.loadoutError(gkey, next)) continue;
+              const sc = score(game, p, next);
+              if (sc > cur) { cur = sc; pick = o; }
             }
+            if (pick) items = [...items, pick];
           }
-          const s = score(gkey, items);
+          const s = cur;
           if (s > best.score) best = { items, score: s };
         }
       }
@@ -121,8 +155,8 @@
           const d = def(c);
           if (d.buy > p.gold) continue;
           const g = bestLoadout(game, p, c).score - base;
-          const eff = g - d.buy * 0.12;
-          if (g > 6 && eff > gain) { gain = eff; pick = c; }
+          const eff = g - d.buy * 0.01;
+          if (g > 0.75 && eff > gain) { gain = eff; pick = c; }
         }
         return pick;
       };
@@ -133,7 +167,7 @@
         return;
       }
       let pick = st.noBuy ? null : tryBuy();
-      if (!pick && !st.noBuy && p.gold >= 70 && game.rng() < 0.4) {
+      if (!pick && !st.noBuy && p.gold >= 60) {
         if (!game.actRefresh(p)) { await pause(); pick = tryBuy(); }
       }
       if (pick) {
@@ -171,7 +205,7 @@
       let bi = 0, bs = -Infinity;
       pool.forEach((c, i) => {
         const rest = p.glad.equipped.filter((x) => x !== c);
-        const s = score(p.glad.key, rest);
+        const s = score(game, p, rest);
         if (s > bs) { bs = s; bi = i; }
       });
       return bi;
