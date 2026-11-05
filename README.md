@@ -36,6 +36,7 @@ Run the simulation with `node tests/simulate.js 300`.
 The rules leave a few details open. This version assumes:
 
 - **The Crowd Grows Restless** (house rule): the crowd hurls stones. From turn 11 of an arena, at the start of each turn every living Gladiator loses 10 VITA, in turn order. It ignores armor and can't trigger Furor Mortis; the Sacred Coin flip applies as usual. If the stones eliminate everyone at once, the Gladiator with the most VITA before the stones wins the arena; a tie means no laurel.
+- **Furor Mortis mutual kills** (house rule): if the final attack kills the killer and nobody is left standing, the Gladiator with more VITA before their fatal blow (the victim before the killing hit, the killer before the final attack) wins the arena; a tie means no laurel.
 - **Armor-ignoring weapons:** Pilum (ignores shield and body armor) and Sica (ignores shield and arm armor) apply to the whole attack, so a Pilum + Sica pair skips shield, body and arm armor. Ignored body armor also loses its auto-hit reduction. Clava then halves the remaining armor. Leo, Canis and Cerberus damage ignores armor entirely.
 - **Auto-hit reductions:** Lorica Squamata (−10), Lorica Segmentata (−20) and Ursus (−10) reduce auto-hit damage, to a minimum of 5.
 - A Gladiator whose only weapon is a Rete still punches for 10.

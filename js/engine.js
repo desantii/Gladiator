@@ -170,8 +170,7 @@
       this.hadesDeck = new Deck(HADES, this.rng, 'Hades');
       this.gladDeck = new Deck(GLADIATORS, this.rng, 'Gladiator');
       this.market = [];
-      this.stoneWinner = null;
-      this.stoneTie = false;
+      this.tiebreak = null; // { winner, tie, why } when everyone falls at once
       this.refillMarket();
       for (const p of this.players) {
         p.hand = [];
@@ -264,11 +263,11 @@
       }
 
       const alive = this.living();
-      const stoneWinner = alive.length === 0 ? this.stoneWinner : null;
-      if (stoneWinner) {
-        const w = stoneWinner;
+      const tb = alive.length === 0 ? this.tiebreak : null;
+      if (tb && tb.winner) {
+        const w = tb.winner;
         w.laurels += 1;
-        this.log(`🌿 The stones fell everyone, but <b>${w.name}</b> had the most VITA before the volley and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
+        this.log(`🌿 ${tb.why}, but <b>${w.name}</b> had the most VITA before the final blows and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
         if (w.laurels >= this.laurelsToWin) this.champion = w;
       } else if (alive.length === 1 && this.turn <= this.maxTurns) {
         const w = alive[0];
@@ -276,7 +275,7 @@
         this.log(`🌿 <b>${w.name}</b> is the last Gladiator standing and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
         if (w.laurels >= this.laurelsToWin) this.champion = w;
       } else if (alive.length === 0) {
-        this.log(`No Gladiator is left standing${this.stoneTie ? ' and the VITA before the stones was tied' : ''}. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
+        this.log(`No Gladiator is left standing${tb && tb.tie ? ' and their VITA before the final blows was tied' : ''}. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
       }
       this.phase = 'arenaEnd';
       this.active = null;
@@ -818,6 +817,7 @@
 
     async takeDamage(p, dmg, src) {
       if (dmg <= 0 || !p.glad.alive) return;
+      p.glad.vitaBeforeHit = p.glad.vita;
       p.glad.vita -= dmg;
       if (p.glad.vita > 0) {
         this.update();
@@ -867,9 +867,16 @@
         const heads = await this.flip(`Furor Mortis: ${p.name}'s revenge`);
         if (heads) {
           this.log(`😤 With their dying breath, ${p.name} strikes back at ${k.name}!`, 'crit');
+          const victimVita = g.vitaBeforeHit;
+          const killerVita = k.glad.vita;
           g.finalAttacking = true;
           await this.resolveAttack(p, k, { final: true });
           g.finalAttacking = false;
+          // If the revenge leaves nobody standing, the one with more VITA before their fatal blow wins.
+          if (!this.living().length) {
+            if (victimVita === killerVita) this.tiebreak = { tie: true };
+            else this.tiebreak = { winner: victimVita > killerVita ? p : k, why: `${p.name} and ${k.name} took each other down` };
+          }
         } else {
           this.log(`${p.name} boards the boat to cross into Hades.`, 'dim');
         }
@@ -891,8 +898,7 @@
       if (before.length && !this.living().length) {
         const top = Math.max(...before.map((b) => b.vita));
         const leaders = before.filter((b) => b.vita === top);
-        if (leaders.length === 1) this.stoneWinner = leaders[0].p;
-        else this.stoneTie = true;
+        this.tiebreak = leaders.length === 1 ? { winner: leaders[0].p, why: 'The stones fell everyone' } : { tie: true };
       }
     }
 
