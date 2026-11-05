@@ -763,7 +763,8 @@
 
     computeDamage(a, t, auto) {
       const ws = this.weapons(a).map(def);
-      let normal = 0, ignore = 0, pierce = 0, half = false, ursus = false;
+      let normal = 0, ignore = 0, half = false, ursus = false;
+      const skipLocs = new Set();
       const parts = [];
       for (const w of ws) {
         let v;
@@ -777,7 +778,7 @@
           if (w.name === 'Pugio' && t.glad.vita < 30) { v *= 2; parts.push('Pugio doubled'); }
         }
         if (w.ignoreArmor) ignore += v; else normal += v;
-        if (w.pierce) pierce += w.pierce;
+        for (const l of w.ignoreLocs || []) skipLocs.add(l);
         if (w.halfArmor) half = true;
       }
       if (ws.every((w) => !w.beast && !w.atk)) { normal += RULES.fists; parts.push('fists 10'); }
@@ -786,7 +787,7 @@
       if (auto) {
         let total = normal + ignore;
         let red = 0;
-        for (const c of t.glad.equipped) red += def(c).autoReduce || 0;
+        for (const c of t.glad.equipped) if (!skipLocs.has(def(c).loc)) red += def(c).autoReduce || 0;
         if (ursus) red += 10;
         if (red) parts.push(`auto-hit reduced by ${red}`);
         total = Math.max(5, ceil5(total - red));
@@ -794,7 +795,9 @@
         return { total, detail: parts.join(', ') };
       }
       const armor = Math.max(0, this.totalDef(t) - (t.glad.debuff.armorPhase || 0));
-      let eff = Math.max(0, armor - pierce);
+      let ignored = 0;
+      for (const c of t.glad.equipped) { const d = def(c); if (d.type === 'armor' && skipLocs.has(d.loc)) ignored += d.def; }
+      let eff = Math.max(0, armor - ignored);
       if (half) eff = ceil5(eff / 2);
       if (armor) parts.push(`armor ${armor}${eff !== armor ? `→${eff}` : ''}`);
       const total = Math.max(5, ceil5(Math.max(0, normal - eff) + ignore));

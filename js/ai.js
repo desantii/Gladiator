@@ -15,11 +15,12 @@
   function expAttack(aKey, aItems, tKey, tItems) {
     const ws = aItems.map(def).filter((d) => d.type === 'weapon');
     const td = tItems.map(def);
-    let normal = 0, ignore = 0, pierce = 0, half = false, ursus = false, hasta = false, red = 0;
+    let normal = 0, ignore = 0, half = false, ursus = false, hasta = false, red = 0;
+    const skip = new Set();
     for (const w of ws) {
       const v = w.beast ? 3.5 * w.beast : w.atk;
       if (w.ignoreArmor) ignore += v; else normal += v;
-      pierce += w.pierce || 0;
+      for (const l of w.ignoreLocs || []) skip.add(l);
       if (w.halfArmor) half = true;
       if (w.autoReduceOwn) ursus = true;
       if (w.autoOn) hasta = true;
@@ -27,11 +28,11 @@
     }
     if (ws.every((w) => !w.beast && !w.atk)) normal += RULES.fists;
     if (aKey === 'bestia') normal += 10;
-    const armor = td.reduce((s, d) => s + (d.type === 'armor' ? d.def : 0), 0);
-    let eff = Math.max(0, armor - pierce);
+    const armor = td.reduce((s, d) => s + (d.type === 'armor' && !skip.has(d.loc) ? d.def : 0), 0);
+    let eff = armor;
     if (half) eff = Math.ceil(eff / 10) * 5;
     const regular = Math.max(5, normal - eff + ignore);
-    const autoRed = td.reduce((s, d) => s + (d.autoReduce || 0), 0) + (ursus ? 10 : 0);
+    const autoRed = td.reduce((s, d) => s + (skip.has(d.loc) ? 0 : d.autoReduce || 0), 0) + (ursus ? 10 : 0);
     const auto = Math.max(5, normal + ignore - autoRed);
     let dodge = 0;
     if (tKey !== 'bestia') {

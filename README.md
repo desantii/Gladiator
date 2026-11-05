@@ -35,7 +35,7 @@ Run the simulation with `node tests/simulate.js 300`.
 
 The rules leave a few details open. This version assumes:
 
-- **Armor piercing:** Pilum and Sica stack and apply to the whole attack. Clava then halves the remaining armor. Leo, Canis and Cerberus damage ignores armor entirely.
+- **Armor-ignoring weapons:** Pilum (ignores shield and body armor) and Sica (ignores shield and arm armor) apply to the whole attack, so a Pilum + Sica pair skips shield, body and arm armor. Ignored body armor also loses its auto-hit reduction. Clava then halves the remaining armor. Leo, Canis and Cerberus damage ignores armor entirely.
 - **Auto-hit reductions:** Lorica Squamata (−10), Lorica Segmentata (−20) and Ursus (−10) reduce auto-hit damage, to a minimum of 5.
 - A Gladiator whose only weapon is a Rete still punches for 10.
 - The 1-Legendary limit applies to equipped items.
