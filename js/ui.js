@@ -337,8 +337,11 @@
         </div><span class="spacer"></span>`;
       const bDraw = mkBtn('Draw free card', () => act(() => g.actDraw(p)), s.drawn || s.buys > 0, 'Draw 1 card for free from the Equipment deck (instead of buying)');
       const bRef = mkBtn(`Refresh Market (${RULES.refreshCost})`, () => act(() => g.actRefresh(p)), s.refreshed || s.drawn || s.buys > 0 || p.gold < RULES.refreshCost, 'Once per phase, before drawing or buying', true);
-      const bEnd = mkBtn('End Equip Phase ✔', () => {
-        if (!s.drawn && !s.buys && !confirm("You haven't drawn or bought a card this phase. End anyway?")) return;
+      const bEnd = mkBtn('End Equip Phase ✔', async () => {
+        if (!s.drawn && !s.buys) {
+          const ok = await modalChoice('End your Equip Phase?', "You haven't drawn or bought a card this phase.", [{ label: 'Go back', value: false }, { label: 'End anyway', value: true }]);
+          if (!ok) return;
+        }
         const r = state.equipResolve; state.equipResolve = null; r && r();
       }, false, 'Lock in your equipment until your next Equip Phase');
       head.append(bRef, bDraw, bEnd);
@@ -493,7 +496,10 @@
   };
   $('btn-new').onclick = () => {
     if (!$('modal').classList.contains('hidden')) return;
-    if (state.game && state.game.phase !== 'over' && !confirm('Abandon the current game?')) return;
+    if (state.game && state.game.phase !== 'over') {
+      modalChoice('Abandon the current game?', 'The current game will be lost.', [{ label: 'Keep playing', value: false }, { label: 'Start a new game', value: true }]).then((ok) => { if (ok) showSetup(); });
+      return;
+    }
     showSetup();
   };
   showSetup();
