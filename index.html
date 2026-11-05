@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gladiator</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">GLADIATOR <span class="ver">v6.1</span></div>
+    <div id="status" class="status"></div>
+    <div class="top-actions">
+      <label class="speed">Speed
+        <select id="speed">
+          <option value="1.6">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="0.45">Fast</option>
+          <option value="0.08">Instant</option>
+        </select>
+      </label>
+      <button id="btn-rules" class="btn ghost">Rules</button>
+      <button id="btn-new" class="btn ghost">New game</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="board">
+      <section id="players" class="players"></section>
+
+      <section class="center">
+        <div class="market-wrap">
+          <h3>Mercatus <span class="sub">the Market</span></h3>
+          <div id="market" class="market"></div>
+        </div>
+        <div class="decks">
+          <div id="deck-equip" class="deck back-equip"></div>
+          <div id="stage" class="stage"><div class="stage-inner">Welcome to the arena</div></div>
+          <div class="deck-col">
+            <div id="deck-attack" class="deck small back-attack"></div>
+            <div id="deck-hades" class="deck small back-hades"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="hand-area" class="hand-area"></section>
+    </main>
+
+    <aside class="log-wrap">
+      <h3>Acta Diurna <span class="sub">game log</span></h3>
+      <ol id="log" class="log"></ol>
+    </aside>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-box" id="modal-box"></div></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
