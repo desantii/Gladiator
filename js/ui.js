@@ -233,7 +233,7 @@
   function renderStatus(g) {
     const phase = { setup: 'Setup', equip: 'Equip Phase', attack: 'Attack Phase', arenaEnd: 'Arena over', over: 'Game over' }[g.phase] || '';
     const who = g.active ? ` · <b>${esc(g.active.name)}</b>${g.phase === 'attack' && g.active.glad && !g.active.glad.alive ? ' (Hades)' : ''}` : '';
-    $('status').innerHTML = `Arena <b>${g.arena}</b> · Turn <b>${g.turn}</b> · ${phase}${who}${g.turn >= RULES.restlessTurn ? ' · <span style="color:#ffcf5a">📣 Crowd restless: −10 VITA each turn</span>' : g.turn >= RULES.restlessTurn - 2 && g.phase !== 'arenaEnd' ? ` · <span class="dim">Crowd grows restless from turn ${RULES.restlessTurn}</span>` : ''}${g.noDodgePhase ? ' · <span style="color:#ff9d8c">🙌 Hands in the Sand: nobody can dodge</span>' : ''}`;
+    $('status').innerHTML = `Arena <b>${g.arena}</b> · Turn <b>${g.turn}</b> · ${phase}${who}${g.turn >= RULES.restlessTurn ? ' · <span style="color:#ffcf5a">🪨 Crowd hurls stones: −10 VITA each turn</span>' : g.turn >= RULES.restlessTurn - 2 && g.phase !== 'arenaEnd' ? ` · <span class="dim">Crowd grows restless from turn ${RULES.restlessTurn}</span>` : ''}${g.noDodgePhase ? ' · <span style="color:#ff9d8c">🙌 Hands in the Sand: nobody can dodge</span>' : ''}`;
   }
 
   function renderPlayers(g) {
@@ -455,7 +455,7 @@
       <h4>Attacking</h4>
       <p>Roll a die. <b>Higher than the target's dodge = hit.</b> Damage = total weapon attack − target's armor (minimum 5, rounded up to 5). A <b>6 is an auto-hit</b> that ignores armor. Unarmed Gladiators punch for 10. Beasts (Leo, Ursus, Canis, Cerberus) roll a die for damage. Dodge is always between 1 and 4.</p>
       <h4>The Crowd Grows Restless</h4>
-      <p>Starting in turn 11 of an arena, at the start of each turn every living Gladiator loses 10 VITA. This ignores armor and cannot trigger Furor Mortis (the Emperor's Favor still applies).</p>
+      <p>The crowd is bored and starts hurling stones into the arena. Starting on turn 11, at the start of each turn, every living Gladiator loses 10 VITA. This ignores armor and cannot trigger Furor Mortis. The Sacred Coin flip applies as usual. If the stones eliminate all remaining Gladiators at once, the Gladiator with the most VITA before the stones wins the arena. If still tied, no one earns a laurel.</p>
       <h4>Death</h4>
       <p><b>The Emperor's Favor:</b> the first time a Gladiator reaches 0 VITA, flip the Sacred Coin. Heads: revived with 30 VITA. Tails: eliminated. Reaching 0 a second time is death.</p>
       <p><b>Furor Mortis:</b> when eliminated by an attack, flip again. Heads: one final attack on the killer. Eliminated players meddle from <b>Hades</b> each Attack Phase.</p>

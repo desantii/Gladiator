@@ -170,6 +170,8 @@
       this.hadesDeck = new Deck(HADES, this.rng, 'Hades');
       this.gladDeck = new Deck(GLADIATORS, this.rng, 'Gladiator');
       this.market = [];
+      this.stoneWinner = null;
+      this.stoneTie = false;
       this.refillMarket();
       for (const p of this.players) {
         p.hand = [];
@@ -262,13 +264,19 @@
       }
 
       const alive = this.living();
-      if (alive.length === 1 && this.turn <= this.maxTurns) {
+      const stoneWinner = alive.length === 0 ? this.stoneWinner : null;
+      if (stoneWinner) {
+        const w = stoneWinner;
+        w.laurels += 1;
+        this.log(`🌿 The stones fell everyone, but <b>${w.name}</b> had the most VITA before the volley and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
+        if (w.laurels >= this.laurelsToWin) this.champion = w;
+      } else if (alive.length === 1 && this.turn <= this.maxTurns) {
         const w = alive[0];
         w.laurels += 1;
         this.log(`🌿 <b>${w.name}</b> is the last Gladiator standing and wins Arena ${this.arena}! (${w.laurels} laurel${w.laurels > 1 ? 's' : ''})`, 'big');
         if (w.laurels >= this.laurelsToWin) this.champion = w;
       } else if (alive.length === 0) {
-        this.log(`No Gladiator is left standing. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
+        this.log(`No Gladiator is left standing${this.stoneTie ? ' and the VITA before the stones was tied' : ''}. Nobody earns a laurel in Arena ${this.arena}.`, 'big');
       }
       this.phase = 'arenaEnd';
       this.active = null;
@@ -868,13 +876,23 @@
       }
     }
 
-    /** From turn 11, at the start of each turn every living Gladiator loses 10 VITA (ignores armor, no Furor Mortis). */
+    /** The Crowd Grows Restless: from turn 11, at the start of each turn every living Gladiator loses 10 VITA.
+     *  Ignores armor, no Furor Mortis, the Sacred Coin applies. If the stones eliminate everyone at once,
+     *  the Gladiator with the most VITA before the stones wins; a tie means no laurel. */
     async crowdRestless() {
-      this.log(`📣 <b>The Crowd Grows Restless!</b> Every living Gladiator loses ${RULES.restlessDmg} VITA.`, 'hit');
-      await this.io.showCard?.('crowd', { name: 'The Crowd Grows Restless', icon: '📣', text: `Every living Gladiator loses ${RULES.restlessDmg} VITA. Ignores armor.` }, { name: 'The crowd' });
-      for (const p of this.order) {
+      const text = `The crowd is bored and starts hurling stones into the arena. Every living Gladiator loses ${RULES.restlessDmg} VITA. Ignores armor.`;
+      this.log(`🪨 <b>The Crowd Grows Restless!</b> ${text}`, 'hit');
+      await this.io.showCard?.('crowd', { name: 'The Crowd Grows Restless', icon: '🪨', text }, { name: 'The crowd' });
+      const before = this.order.filter((p) => p.glad.alive).map((p) => ({ p, vita: p.glad.vita }));
+      for (const { p } of before) {
         if (!p.glad.alive) continue;
         await this.takeDamage(p, RULES.restlessDmg, { crowd: true });
+      }
+      if (before.length && !this.living().length) {
+        const top = Math.max(...before.map((b) => b.vita));
+        const leaders = before.filter((b) => b.vita === top);
+        if (leaders.length === 1) this.stoneWinner = leaders[0].p;
+        else this.stoneTie = true;
       }
     }
 
