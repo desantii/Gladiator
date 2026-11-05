@@ -1,4 +1,4 @@
-/* Gladiator v6.1 — computer opponents. Simple heuristics, no cheating (it never looks at hidden hands or decks). */
+/* Gladiator v6.3 — computer opponents. Simple heuristics, no cheating (it never looks at hidden hands or decks). */
 (function (root) {
   'use strict';
   const { CARDS, GLADIATORS, RULES } = root.GLAD_DATA;

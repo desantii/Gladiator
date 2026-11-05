@@ -2,7 +2,7 @@
 
 *A Card Game for 2-6 Players*
 
-V6.1
+V6.3
 
 **Welcome to the arena (Overview)**
 
@@ -55,6 +55,8 @@ Champion of the Arena and wins the game.
 
   Six-sided dice                                      6
 
+  Twenty-sided die (turn counter)                     1
+
   Sacred Coin                                         1
   -----------------------------------------------------------------------
 
@@ -86,7 +88,10 @@ Champion of the Arena and wins the game.
 
 6.  Place the Sacred Coin in the middle of the table for players to use.
 
-7.  Each players rolls their die for turn order. If players tie, those
+7.  Set the twenty-sided die to 1 and place it in the middle of the
+    table. This is the turn counter.
+
+8.  Each players rolls their die for turn order. If players tie, those
     players reroll.
 
 **Turn Structure**
@@ -94,13 +99,16 @@ Champion of the Arena and wins the game.
 An arena has several turns, and each turn has two phases: the Equip
 Phase and the Attack Phase.
 
+At the start of each turn, the first player turns the twenty-sided die
+up by 1.
+
 **Phase 1 --- Equip Phase**
 
 On your turn, take the following actions as part of the Equip Phase:
 
 **1 --- Income**
 
-Collect 30 denarii from the Bank (Argentarius). You collect 30 denarii
+Collect 25 denarii from the Bank (Argentarius). You collect 25 denarii
 every turn, including your first. Unspent denarii carry over between
 your turns, but reset to 0 at the start of each new arena.
 
@@ -224,6 +232,17 @@ dodge range becomes **4**.
 Marcus attacks with a Rete (a net) equipped, which shrinks Aurelia\'s
 dodge by 1. Her final dodge is **3** for this attack.
 
+**The Crowd Grows Restless**
+
+The crowd is bored and starts hurling stones into the arena. Starting on
+turn 11, at the start of each turn, every living Gladiator loses 10
+VITA. On turn 15, the Emperor loses patience and orders his archers to
+fire: every living Gladiator loses 30 VITA instead of 10 that turn. The
+stones continue after that. This damage ignores armor and cannot trigger
+Furor Mortis. The Sacred Coin flip applies as usual. If it eliminates
+all remaining Gladiators at once, the Gladiator with the most VITA
+before that damage wins the arena. If still tied, no one earns a laurel.
+
 **Death: The Emperor's Favor**
 
 When your Gladiator reaches 0 VITA for the first time, flip the Sacred
@@ -251,8 +270,10 @@ Gladiator that killed them, following the usual attack rules.\
 • Tails: no final attack. They board the boat to cross into Hades.
 
 No final attack if the Gladiator was killed by a Hades card. A final
-attack can\'t trigger another final attack. If no Gladiator is left
-standing, no one earns a laurel.
+attack can\'t trigger another final attack. If a final attack eliminates
+the last Gladiator standing, that Gladiator still wins the arena: they
+outlived their opponent. Otherwise, if no Gladiator is left standing, no
+one earns a laurel.
 
 **Hades**
 
@@ -358,11 +379,11 @@ weapon. The total attack is the sum of all equipped weapon values.
   Gladius (Short 50           40        20         Cannot be paired with a Tridens
   Sword)                                           (Trident).
 
-  Pilum (Spear)  50           50        25         Ignores 10 points of the defender\'s
-                                                   armor.
+  Pilum (Spear)  50           60        30         Ignores the defender\'s shield and
+                                                   body armor.
 
-  Sica (Curved   35           40        20         Ignores 20 points of the defender\'s
-  Blade)                                           armor.
+  Sica (Curved   45           45        25         Ignores the defender\'s shield and
+  Blade)                                           arm armor.
 
   Clava (Spiked  40           45        25         Armor counts half against this
   Club)                                            weapon (round up to the nearest 5).
@@ -508,7 +529,7 @@ maximum of 1 Legendary item at a time, and there is only 1 copy of each.
 **Quick Reference**
 
 +--------------------+-------------------------------------------------+
-| Income per turn    | 30 denarii every turn.                          |
+| Income per turn    | 25 denarii every turn.                          |
 +--------------------+-------------------------------------------------+
 | Sell value         | Printed on each card (50% of buy price).        |
 +--------------------+-------------------------------------------------+

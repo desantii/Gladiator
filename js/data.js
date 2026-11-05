@@ -1,4 +1,4 @@
-/* Gladiator v6.1 — card data, taken from the rules manual (docs/rules-v6.1.md). */
+/* Gladiator v6.3 — card data, taken from the rules manual (docs/rules-v6.3.md). */
 (function (root) {
   'use strict';
 
@@ -21,7 +21,7 @@
       text: 'Cannot be paired with a Tridens.' },
     pilum: { name: 'Pilum', en: 'Spear', type: 'weapon', cat: 'weapon', atk: 50, hands: 1, buy: 60, sell: 30, count: 5, icon: '🏑', ignoreLocs: ['off', 'body'],
       text: "Ignores the defender's shield and body armor." },
-    sica: { name: 'Sica', en: 'Curved Blade', type: 'weapon', cat: 'weapon', atk: 45, hands: 1, buy: 40, sell: 20, count: 3, icon: '🌙', ignoreLocs: ['off', 'arm'],
+    sica: { name: 'Sica', en: 'Curved Blade', type: 'weapon', cat: 'weapon', atk: 45, hands: 1, buy: 45, sell: 25, count: 3, icon: '🌙', ignoreLocs: ['off', 'arm'],
       text: "Ignores the defender's shield and arm armor." },
     clava: { name: 'Clava', en: 'Spiked Club', type: 'weapon', cat: 'weapon', atk: 40, hands: 1, buy: 45, sell: 25, count: 3, icon: '🏏', halfArmor: true,
       text: 'Armor counts half against this weapon (round up to the nearest 5).' },
@@ -150,7 +150,7 @@
   const ART = (root.GLAD_ART || {});
 
   const RULES = {
-    income: 30,
+    income: 25,
     refreshCost: 20,
     maxBuys: 2,
     marketSize: 3,

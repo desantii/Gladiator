@@ -1,4 +1,4 @@
-/* Gladiator v6.1 — rules engine. No DOM: talks to the outside through an `io` object:
+/* Gladiator v6.3 — rules engine. No DOM: talks to the outside through an `io` object:
  *   io.log(msg, cls)                 append to game log
  *   io.update()                      state changed, re-render
  *   io.delay(ms)                     pacing (Promise)
