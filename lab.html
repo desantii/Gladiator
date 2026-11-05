@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gladiator Balance Lab</title>
+  <style id="lab-style">
+    /* Layout: a two-column workbench, rule editor on the left, results on the right; one column on phones. */
+    :root {
+      color-scheme: dark;
+      --bg: #17110c;
+      --panel: #221912;
+      --panel2: #2d2219;
+      --line: #4a3828;
+      --text: #f2e8d5;
+      --muted: #b4a387;
+      --bronze: #d4a63a;
+      --bronze2: #f0c95c;
+      --changed: #3a2c12;
+      --s1: #3987e5;  /* v6.3 baseline */
+      --s2: #d95926;  /* your variant */
+      --up: #f0c95c;
+      --down: #8fc2f0;
+      --display: Georgia, 'Times New Roman', serif;
+      --body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 var(--body); }
+    body::before { content: ''; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+    header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+      display: flex; gap: 12px 20px; align-items: center; flex-wrap: wrap; padding-block: 10px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    .brand { font: bold 20px var(--display); letter-spacing: 5px; color: var(--bronze2); }
+    .brand small { font: 12px var(--body); letter-spacing: 0; color: var(--muted); margin-left: 6px; }
+    header .spacer { flex: 1; }
+    a { color: var(--bronze2); }
+    .layout { display: grid; grid-template-columns: minmax(320px, 440px) minmax(0, 1fr); gap: 16px; padding-block: 16px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+    .side, .main { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    h2 { font: bold 18px var(--display); color: var(--bronze2); margin: 0 0 4px; text-wrap: balance; }
+    h3 { font: bold 16px var(--display); color: var(--bronze); margin: 0 0 6px; letter-spacing: 1px; }
+    .muted { color: var(--muted); }
+    .btn { font: bold 14px var(--body); background: linear-gradient(#e2b64c, #b8892a); color: #2a1a07; border: 1px solid #f3d27a; border-radius: 8px; padding: 8px 16px; cursor: pointer; }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); font-weight: normal; }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--bronze2); outline-offset: 2px; }
+    .run-ctl { display: flex; flex-direction: column; gap: 10px; }
+    .row { display: flex; gap: 8px 14px; flex-wrap: wrap; align-items: center; }
+    .pcs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pcs label { border: 1px solid var(--line); border-radius: 16px; padding: 3px 10px; cursor: pointer; user-select: none; }
+    .pcs input { accent-color: var(--bronze); margin: 0 4px 0 0; }
+    .pcs label:has(input:checked) { border-color: var(--bronze); background: var(--changed); }
+    select, input[type=number] { background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 6px; font: 13px var(--body); font-variant-numeric: tabular-nums; }
+    input[type=number] { width: 64px; }
+    #seed { width: 80px; }
+    .progress { position: relative; height: 22px; border-radius: 11px; background: var(--panel2); border: 1px solid var(--line); overflow: hidden; }
+    .progress span { position: absolute; inset: 0 auto 0 0; width: 0; background: linear-gradient(90deg, #8a6418, var(--bronze)); transition: width .2s; }
+    .progress b { position: relative; display: block; text-align: center; font-size: 12px; line-height: 20px; }
+    #changes { font-size: 13px; }
+    details { border-top: 1px solid var(--line); padding-block: 6px; }
+    details:first-child { border-top: 0; }
+    summary { cursor: pointer; font: bold 15px var(--display); color: var(--bronze); padding: 4px 0; }
+    .pill { font: 11px var(--body); background: var(--changed); color: var(--bronze2); border: 1px solid #7a5a1c; border-radius: 10px; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+    .rules-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 6px 0; }
+    .tbl-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+    table.edit th, table.edit td { padding: 3px 4px; text-align: left; border-bottom: 1px solid #33271c; white-space: nowrap; }
+    table.edit thead th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: normal; }
+    table.edit tbody th { font-weight: normal; }
+    table.edit input[type=number] { width: 56px; }
+    .fld { display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; }
+    .fld.changed input { border-color: var(--bronze); background: var(--changed); color: var(--bronze2); }
+    .fld .was { font-size: 10px; color: var(--muted); }
+    .fld .pre { font-size: 11px; color: var(--muted); }
+    .na { color: #5b4a37; }
+    .empty-state { max-width: 62ch; }
+    .empty-state p { margin: 8px 0; }
+    .run-head { display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+    .run-head > div { min-width: 0; flex: 1 1 300px; }
+    section.res { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .legend { display: flex; gap: 16px; font-size: 13px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .sw.s1 { background: var(--s1); } .sw.s2 { background: var(--s2); }
+    .chart { max-width: 720px; }
+    svg.hist { width: 100%; height: auto; display: block; }
+    svg .grid { stroke: #3a2d21; stroke-width: 1; }
+    svg .base { stroke: #6b5638; stroke-width: 1; }
+    svg .ax { fill: var(--muted); font: 11px var(--body); }
+    svg .bar.s1 { fill: var(--s1); } svg .bar.s2 { fill: var(--s2); }
+    svg .hit { fill: transparent; cursor: crosshair; }
+    svg .hit:hover { fill: rgba(240, 201, 92, .08); }
+    table.res-t th, table.res-t td { padding: 5px 8px; border-bottom: 1px solid #33271c; text-align: left; }
+    table.res-t thead th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: normal; }
+    table.res-t tbody th { font-weight: normal; }
+    table.res-t th[title] { text-decoration: underline dotted #6b5638; text-underline-offset: 3px; cursor: help; }
+    .num { text-align: right !important; }
+    .delta.up { color: var(--up); } .delta.down { color: var(--down); }
+    .tag { font-size: 10px; border-radius: 8px; padding: 0 6px; margin-left: 6px; border: 1px solid; }
+    .tag.hot { color: #ffb38a; border-color: #7a3c1e; } .tag.cold { color: #9cc7ee; border-color: #2d4c6b; }
+    #tip { position: fixed; z-index: 30; background: #0e0a07; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font-size: 12px; pointer-events: none; max-width: 260px; }
+    #toast { position: fixed; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: #1f4a22; border: 1px solid #5fae5a; color: #fff; padding: 9px 14px; border-radius: 8px; z-index: 40; max-width: calc(100vw - 32px); }
+    #copy-box { width: 100%; height: 160px; background: var(--panel2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; font: 12px ui-monospace, monospace; }
+    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">GLADIATOR <small>Balance Lab · rules v6.3</small></div>
+    <span class="spacer"></span>
+    <a href="index.html" id="game-link">Play the game →</a>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <div class="card run-ctl">
+        <h2>Run a test</h2>
+        <div class="row"><span class="muted">Players</span>
+          <div class="pcs">
+            <label><input type="checkbox" name="pc" value="2">2</label>
+            <label><input type="checkbox" name="pc" value="3">3</label>
+            <label><input type="checkbox" name="pc" value="4" checked>4</label>
+            <label><input type="checkbox" name="pc" value="5">5</label>
+            <label><input type="checkbox" name="pc" value="6">6</label>
+          </div>
+        </div>
+        <div class="row">
+          <label for="games" class="muted">Games each</label>
+          <select id="games"><option>50</option><option>100</option><option selected>250</option><option>500</option><option>1000</option></select>
+          <label for="seed" class="muted" title="Same seed = same dice, so runs can be repeated exactly">Seed</label>
+          <input type="number" id="seed" value="1" min="1" step="1">
+        </div>
+        <label class="row"><input type="checkbox" id="compare" checked> Compare with v6.3 (runs each game twice)</label>
+        <div class="row">
+          <button class="btn" id="btn-run">Run simulation</button>
+          <button class="btn ghost" id="btn-stop" hidden>Stop</button>
+        </div>
+        <div class="progress" id="progress" hidden><span></span><b>Starting…</b></div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2>Your variant</h2>
+          <button class="btn ghost" id="btn-reset">Reset to v6.3</button>
+        </div>
+        <p id="changes" class="muted"></p>
+        <div id="editor"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="card" id="results"></div>
+      <textarea id="copy-box" hidden aria-label="Results as text"></textarea>
+      <p class="muted" style="max-width:70ch">Results come from computer players, which spend money and pick gear by expected damage against their opponents. People will play differently, so use the lab to compare rule versions rather than to predict exact numbers.</p>
+    </main>
+  </div>
+
+  <div id="tip" hidden></div>
+  <div id="toast" hidden></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/lab.js"></script>
+</body>
+</html>

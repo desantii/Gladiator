@@ -22,6 +22,8 @@ Open `index.html` in any modern browser. There's nothing to install or build.
 | `js/ai.js` | Computer opponents |
 | `js/ui.js`, `css/style.css`, `index.html` | Browser interface |
 | `tests/simulate.js` | Headless AI-vs-AI games that check rule invariants |
+| `lab.html`, `js/lab.js` | Balance lab: edit rules and card stats, run AI games, compare with v6.3 |
+| `art/` | Card images (see `art/README.md`) |
 
 Run the simulation with `node tests/simulate.js 300`.
 
