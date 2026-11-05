@@ -90,8 +90,10 @@
     }
     return el;
   }
+  const FACES = window.GLAD_CARD_FACES || {};
   function gladCardHTML(key) {
     const g = GLADIATORS[key];
+    if (FACES[key]) return `<img class="card-face" src="${esc(FACES[key])}" alt="${esc(g.name)} card: ${esc(g.text)} VITA ${g.vita}, dodge ${g.dodge || 'never'}.">`;
     return `<div class="card cat-gladiator">${faceHTML({ type: 'GLADIATOR', name: g.name, count: g.count, key, icon: g.icon, text: g.text, footL: `DODGE ${g.dodge || 'NEVER'}`, footR: `VITA ${g.vita}` })}</div>`;
   }
 
@@ -263,7 +265,7 @@
       const dodge = gl.key === 'bestia' || g.noDodgePhase ? 'never' : Math.max(1, g.ownDodge(p) - (gl.key === 'amazonia' ? 0 : gl.debuff.dodgePhase || 0));
       el.innerHTML = `
         <div class="pp-head"><span class="pp-name">${esc(p.name)}${p.isAI ? '<span class="tag">AI</span>' : ''}</span><span class="laurels" title="${p.laurels} laurels">${laurelHTML(p.laurels, g.laurelsToWin)}</span></div>
-        <div class="pp-glad" title="${esc(gd.text)}">${gd.icon} ${gd.name} <span class="ab">— ${esc(gd.text)}</span></div>
+        <div class="pp-glad-row">${FACES[gl.key] ? `<button class="glad-thumb" data-face="${gl.key}" style="background-image:url('${esc(FACES[gl.key])}')" title="View the ${gd.name} card" aria-label="View the ${gd.name} card"></button>` : ''}<div class="pp-glad" title="${esc(gd.text)}">${FACES[gl.key] ? '' : gd.icon + ' '}${gd.name} <span class="ab">— ${esc(gd.text)}</span></div></div>
         <div class="vita"><div class="vita-fill ${cls}" style="width:${pct * 100}%"></div><div class="vita-txt">VITA ${gl.vita} / ${gl.max}</div></div>
         <div class="pp-stats"><span>ATK <b>${g.attackText(p)}</b></span><span>DEF <b>${g.totalDef(p)}</b></span><span title="Attack rolls must beat this number">Dodge <b>${dodge}</b></span><span>💰 <b>${p.gold}</b></span><span>✋ <b>${p.hand.length}</b></span></div>
         <div class="badges">${badges.join('')}</div>`;
@@ -498,6 +500,17 @@
       modalChoice('🏆 Champion of the Arena', `<b>${esc(champ.name)}</b> has won ${g.laurelsToWin} arenas and is crowned Champion!`, [{ label: 'New game', value: true }]).then(showSetup);
     }).catch((e) => { console.error(e); toast('Something went wrong: ' + e.message); });
   }
+
+  function showFace(key) {
+    if (!$('modal').classList.contains('hidden')) return; // never cover a decision the game is waiting on
+    const box = openModal(`<div class="face-view">${gladCardHTML(key)}</div><div class="mopts"><button class="btn" id="face-close">Close</button></div>`);
+    box.classList.add('face-box');
+    box.querySelector('#face-close').onclick = closeModal;
+  }
+  $('players').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-face]');
+    if (t) showFace(t.dataset.face);
+  });
 
   // ------------------------------------------------------------ wire up
   $('speed').onchange = (e) => { state.speed = +e.target.value; };

@@ -61,6 +61,15 @@ h3 .sub { text-transform: none; letter-spacing: 0; color: var(--muted); font-siz
 .pp-name .tag { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: middle; font-weight: normal; }
 .laurels { color: var(--green); letter-spacing: 2px; font-size: 14px; white-space: nowrap; }
 .laurels .off { color: #4b4034; }
+.pp-glad-row { display: flex; gap: 8px; align-items: center; margin: 2px 0 6px; }
+.pp-glad-row .pp-glad { margin: 0; min-width: 0; }
+.glad-thumb { flex: none; width: 46px; height: 46px; border-radius: 8px; border: 1px solid var(--bronze); background-color: #d3c3a0; background-size: 230% auto; background-position: 50% 40%; cursor: zoom-in; padding: 0; }
+.glad-thumb:hover { filter: brightness(1.1); }
+.glad-thumb:focus-visible { outline: 2px solid var(--bronze2); outline-offset: 2px; }
+.card-face { width: 210px; max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 14px #000a; display: block; }
+.face-view { display: flex; justify-content: center; margin-bottom: 12px; }
+.face-view .card-face { width: 360px; }
+.modal-box.face-box { max-width: 420px; }
 .pp-glad { font-size: 13px; color: var(--bronze2); margin: 2px 0 6px; cursor: help; }
 .pp-glad .ab { color: var(--muted); font-size: 11px; }
 .vita { height: 16px; background: #120c08; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; position: relative; }
