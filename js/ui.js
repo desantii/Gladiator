@@ -358,6 +358,30 @@
     }
     area.appendChild(head);
 
+    // Equipped gear, shown as full cards like the hand.
+    const eqLabel = document.createElement('div');
+    eqLabel.className = 'hand-label';
+    const total = p.glad ? p.glad.equipped.length : 0;
+    eqLabel.textContent = `Equipped on ${p.glad ? GLADIATORS[p.glad.key].name : 'your Gladiator'} (${total})${mine ? '' : ' — locked until your next Equip Phase'}`;
+    area.appendChild(eqLabel);
+    const eqRow = document.createElement('div');
+    eqRow.className = 'hand-row';
+    if (!total) eqRow.innerHTML = `<span class="empty">Nothing equipped: your Gladiator fights with fists (${RULES.fists}).</span>`;
+    for (const c of p.glad ? p.glad.equipped : []) {
+      const d = def(c);
+      const actions = [];
+      if (mine) {
+        if (c.locked) {
+          actions.push({ label: '🔒 Locked', disabled: true, ghost: true, title: "Retiarius's Rete cannot be unequipped or sold" });
+        } else {
+          actions.push({ label: 'Unequip', disabled: s.haunted, title: s.haunted ? 'Haunted Dreams: you cannot change your gear this phase' : 'Move back to your hand', onClick: () => act(() => g.actUnequip(p, c.uid)) });
+          actions.push({ label: `Sell ${d.sell}`, ghost: true, onClick: () => act(() => g.actSell(p, c.uid)) });
+        }
+      }
+      eqRow.appendChild(cardEl(c, actions, state.lastHandUids.has(c.uid) ? 'equipped' : 'equipped new'));
+    }
+    area.appendChild(eqRow);
+
     const label = document.createElement('div');
     label.className = 'hand-label';
     label.textContent = `Hand (${p.hand.length}) — not equipped`;
@@ -381,13 +405,14 @@
       }
       row.appendChild(cardEl(c, actions, state.lastHandUids.has(c.uid) ? '' : 'new'));
     }
+    for (const c of p.glad ? p.glad.equipped : []) seen.add(c.uid);
     state.lastHandUids = seen;
     area.appendChild(row);
     if (mine) {
       const tip = document.createElement('div');
       tip.className = 'hand-sub';
       tip.style.marginTop = '10px';
-      tip.innerHTML = 'Tip: <b>Harena</b> and <b>Furor</b> are offered right before you roll an attack. Equipped items show ↩ (unequip) and 💰 (sell) on your panel above. Hover any card for its full text.';
+      tip.innerHTML = 'Tip: <b>Harena</b> and <b>Furor</b> are offered right before you roll an attack. Equipping a card that clashes with your gear swaps the old piece back to your hand. Hover any card for its full text.';
       area.appendChild(tip);
     }
   }

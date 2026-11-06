@@ -142,7 +142,10 @@ h3 .sub { text-transform: none; letter-spacing: 0; color: var(--muted); font-siz
 .card .c-foot { display: flex; justify-content: space-between; font-size: 9px; letter-spacing: .5px; color: #4a3920; }
 .card .c-foot b { color: var(--cc); font-size: 10.5px; }
 .card .c-actions { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+.card .btn.ghost { color: #3a2a18; border-color: #a88b5c; background: #f7efdc; }
+.card .btn.ghost:hover { background: #fff6e2; }
 .card.new { animation: pop .5s ease-out; }
+.card.equipped { box-shadow: 0 3px 8px #0008, inset 0 0 0 1px var(--cc), 0 0 0 2px var(--bronze); }
 .stage .stage-card { width: 170px; margin: 0 auto 4px; text-align: left; }
 .stage .stage-card .c-art { height: 44px; }
 @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
