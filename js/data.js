@@ -8,7 +8,7 @@
     bestia: { name: 'Bestia', vita: 130, dodge: 0, count: 7, icon: '🐗', text: '+10 to all attacks. Cannot dodge.' },
     retiarius: { name: 'Retiarius', vita: 90, dodge: 2, count: 3, icon: '🕸️', text: 'Starts with a Rete equipped (1 weapon slot). Cannot be sold, unequipped or removed by Interceptio.' },
     debilis: { name: 'Debilis', vita: 80, dodge: 1, count: 3, icon: '🥀', text: 'No special ability.' },
-    invictus: { name: 'Invictus', vita: 120, dodge: 3, count: 1, icon: '👑', text: 'No shields or helmets.' },
+    invictus: { name: 'Invictus', vita: 120, dodge: 2, count: 1, icon: '👑', text: 'No shields or helmets.' },
     amazonia: { name: 'Amazonia', vita: 70, dodge: 3, count: 3, icon: '🏹', text: "Dodge reductions don't affect her. No two-handed weapons." },
   };
 
