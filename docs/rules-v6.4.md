@@ -2,7 +2,7 @@
 
 *A Card Game for 2-6 Players*
 
-V6.3
+V6.4
 
 **Welcome to the arena (Overview)**
 
@@ -168,6 +168,14 @@ draw a Hades card and resolve it.
 In a 2-player game, do not draw Attack Cards. Each Gladiator attacks the
 other Gladiator each Attack Phase. (Fulgur Iovis simply attacks your
 single opponent once.)
+
+**Bribe the Lanista**
+
+Before drawing your Attack card, you may pay 30 denarii to the Bank to
+attack a Gladiator of your choice instead. If you pay, do not draw an
+Attack card. You must decide before drawing: you cannot draw a card and
+then pay. Living Gladiators only; dead players always draw a Hades card.
+Does not apply in a 2-player game.
 
 **Attacking**
 

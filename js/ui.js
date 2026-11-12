@@ -1,4 +1,4 @@
-/* Gladiator v6.3 — browser UI. */
+/* Gladiator v6.4 — browser UI. */
 (function () {
   'use strict';
   const { CARDS, GLADIATORS, RULES, ART } = window.GLAD_DATA;
@@ -474,11 +474,11 @@
   function showRules(back) {
     const box = openModal(`
       <div class="rules">
-      <h2>Rules of the Arena (v6.3)</h2>
+      <h2>Rules of the Arena (v6.4)</h2>
       <p><b>Goal.</b> Be the last Gladiator standing to win an arena and earn a laurel. The first player to 3 laurels is Champion.</p>
       <h4>Each turn</h4>
       <p><b>1. Equip Phase</b> (each player in turn order): collect <b>${RULES.income} denarii</b>; sell any cards for their printed sell value (50%); optionally pay <b>20</b> to refresh the 3-card Market (before drawing or buying); then <b>draw 1 free card OR buy up to 2</b> from the Market; finally arrange your equipment. It is locked until your next Equip Phase.</p>
-      <p><b>2. Attack Phase</b> (turn order): living Gladiators draw an Attack card (Left / Right / Your Choice / Pass) and attack. In a 2-player game there are no Attack cards: you always attack each other. Dead Gladiators draw a Hades card instead.</p>
+      <p><b>2. Attack Phase</b> (turn order): living Gladiators draw an Attack card (Left / Right / Your Choice / Pass) and attack. <b>Bribe the Lanista:</b> before drawing, you may pay ${RULES.bribeCost} denarii to attack a Gladiator of your choice instead (not in 2-player games). In a 2-player game there are no Attack cards: you always attack each other. Dead Gladiators draw a Hades card instead.</p>
       <h4>Attacking</h4>
       <p>Roll a die. <b>Higher than the target's dodge = hit.</b> Damage = total weapon attack − target's armor (minimum 5, rounded up to 5). A <b>6 is an auto-hit</b> that ignores armor. Unarmed Gladiators punch for 10. Beasts (Leo, Ursus, Canis, Cerberus) roll a die for damage. Dodge is always between 1 and 4.</p>
       <h4>The Crowd Grows Restless</h4>

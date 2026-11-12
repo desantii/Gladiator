@@ -1,4 +1,4 @@
-/* Gladiator balance lab: edit rules and card stats, run AI-vs-AI games, compare against the v6.3 rules.
+/* Gladiator balance lab: edit rules and card stats, run AI-vs-AI games, compare against the v6.4 rules.
  * Uses the real game engine and AI (data.js, engine.js, ai.js), so results match the playable game. */
 (function () {
   'use strict';
@@ -24,6 +24,7 @@
   add('rules', 'restlessDmg', 'Stone damage', R, 'restlessDmg');
   add('rules', 'archerTurn', 'Archers fire on turn', R, 'archerTurn', { step: 1, min: 1 });
   add('rules', 'archerDmg', 'Archer damage', R, 'archerDmg');
+  add('rules', 'bribeCost', 'Bribe the Lanista cost', R, 'bribeCost');
   add('rules', 'dodgeMax', 'Dodge cap', R, 'dodgeMax', { step: 1, min: 1 });
   const META = { laurelsToWin: 3 };
   add('rules', 'laurelsToWin', 'Laurels to win', META, 'laurelsToWin', { step: 1, min: 1 });
@@ -69,7 +70,7 @@
   function inputHTML(f) {
     const v = f.id in variant ? variant[f.id] : DEFAULTS[f.id];
     const changed = f.id in variant;
-    return `<span class="fld${changed ? ' changed' : ''}">${f.prefix ? `<span class="pre">${f.prefix}</span>` : ''}<input type="number" id="f-${f.id}" data-f="${f.id}" value="${v}" min="${f.min}" step="${f.step}" inputmode="numeric" aria-label="${esc(f.label)}">${changed ? `<span class="was" title="v6.3 value">was ${DEFAULTS[f.id]}</span>` : ''}</span>`;
+    return `<span class="fld${changed ? ' changed' : ''}">${f.prefix ? `<span class="pre">${f.prefix}</span>` : ''}<input type="number" id="f-${f.id}" data-f="${f.id}" value="${v}" min="${f.min}" step="${f.step}" inputmode="numeric" aria-label="${esc(f.label)}">${changed ? `<span class="was" title="v6.4 value">was ${DEFAULTS[f.id]}</span>` : ''}</span>`;
   }
 
   function renderEditor() {
@@ -102,7 +103,7 @@
     }
     wrap.innerHTML = html;
     const n = Object.keys(variant).length;
-    $('changes').textContent = n ? `${n} change${n > 1 ? 's' : ''} from v6.3` : 'No changes yet: edit any number to create a variant.';
+    $('changes').textContent = n ? `${n} change${n > 1 ? 's' : ''} from v6.4` : 'No changes yet: edit any number to create a variant.';
     $('btn-reset').disabled = !n;
   }
 
@@ -135,7 +136,7 @@
     applyConfig(overrides);
     const m = {
       gameTurns: [], arenas: 0, arenaTurns: 0, gamesArenas: 0, reachStones: 0, reachArchers: 0, noWinner: 0,
-      gold: [], atk: [], def: [], dmg: [], buys: 0, draws: 0, refreshes: 0, crowdKills: 0,
+      gold: [], atk: [], def: [], dmg: [], bribes: 0, buys: 0, draws: 0, refreshes: 0, crowdKills: 0,
       gladSeen: {}, gladWins: {}, weap: {}, samples: 0, games: 0,
     };
     for (let i = 0; i < games; i++) {
@@ -182,6 +183,8 @@
         const o = g[fn].bind(g);
         g[fn] = (...args) => { const err = o(...args); if (!err) m[key]++; return err; };
       }
+      const oLog = g.log.bind(g);
+      g.log = (msg, cls) => { if (msg.includes('bribes the Lanista')) m.bribes++; return oLog(msg, cls); };
       const oZero = g.reachZero.bind(g);
       g.reachZero = async (p, src) => { if (src && src.crowd) m.crowdKills++; return oZero(p, src); };
       await g.run();
@@ -216,6 +219,7 @@
     { id: 'dmg', label: 'Damage per hit (typical)', get: (m) => q(m.dmg, 0.5), fmt: 0 },
     { id: 'buyShare', label: 'Turns spent buying (vs free draw)', get: (m) => (100 * m.buys) / Math.max(1, m.buys + m.draws), fmt: 0, unit: '%', hint: 'Market purchases as a share of buy + draw actions.' },
     { id: 'refresh', label: 'Market refreshes per arena', get: (m) => m.refreshes / m.arenas, fmt: 1 },
+    { id: 'bribes', label: 'Bribes per arena', get: (m) => m.bribes / m.arenas, fmt: 1 },
   ];
   const fmtNum = (v, d, unit) => (Number.isFinite(v) ? v.toFixed(d) + (unit || '') : '—');
 
@@ -246,7 +250,7 @@
     const W = 640, H = 220, padL = 36, padR = 8, padT = 10, padB = 34;
     const iw = W - padL - padR, ih = H - padT - padB;
     const bw = iw / bins.length;
-    const series = [ca && { v: ca, cls: 's1', name: 'v6.3 rules' }, cb && { v: cb, cls: 's2', name: 'Your variant' }].filter(Boolean);
+    const series = [ca && { v: ca, cls: 's1', name: 'v6.4 rules' }, cb && { v: cb, cls: 's2', name: 'Your variant' }].filter(Boolean);
     const barW = Math.max(3, (bw - 6) / series.length - 2);
     const y = (v) => padT + ih - (v / yTop) * ih;
     let svg = `<svg viewBox="0 0 ${W} ${H}" class="hist" role="img" aria-label="Distribution of turns per game, ${n} players">`;
@@ -274,16 +278,16 @@
 
   function renderResults() {
     const out = $('results');
-    if (!lastRun) { out.innerHTML = '<div class="empty-state"><h2>No results yet</h2><p>Change a rule or a card on the left, choose the player counts, then press <b>Run simulation</b>. The lab plays the same AI opponents as the game, using identical dice for the v6.3 rules and your variant, so the differences come from your changes.</p><p class="muted">Tip: 250 games per player count takes about 10–30 seconds.</p></div>'; return; }
+    if (!lastRun) { out.innerHTML = '<div class="empty-state"><h2>No results yet</h2><p>Change a rule or a card on the left, choose the player counts, then press <b>Run simulation</b>. The lab plays the same AI opponents as the game, using identical dice for the v6.4 rules and your variant, so the differences come from your changes.</p><p class="muted">Tip: 250 games per player count takes about 10–30 seconds.</p></div>'; return; }
     const { results, overrides, games, compare } = lastRun;
     const changes = Object.entries(overrides);
-    let html = `<div class="run-head"><div><h2>Results</h2><p class="muted">${games} games per player count · ${changes.length ? changes.map(([k, v]) => `${esc(FIELDS.find((f) => f.id === k).label)} ${DEFAULTS[k]} → <b>${v}</b>`).join(' · ') : 'no changes: both columns use v6.3'}</p></div><button class="btn ghost" id="btn-copy">Copy results</button></div>`;
+    let html = `<div class="run-head"><div><h2>Results</h2><p class="muted">${games} games per player count · ${changes.length ? changes.map(([k, v]) => `${esc(FIELDS.find((f) => f.id === k).label)} ${DEFAULTS[k]} → <b>${v}</b>`).join(' · ') : 'no changes: both columns use v6.4'}</p></div><button class="btn ghost" id="btn-copy">Copy results</button></div>`;
     for (const r of results) {
       const A = r.A, B = r.B;
       html += `<section class="res"><h3>${r.n} players</h3>`;
-      html += `<div class="legend">${A ? '<span><i class="sw s1"></i>v6.3 rules</span>' : ''}${B ? '<span><i class="sw s2"></i>Your variant</span>' : ''}</div>`;
+      html += `<div class="legend">${A ? '<span><i class="sw s1"></i>v6.4 rules</span>' : ''}${B ? '<span><i class="sw s2"></i>Your variant</span>' : ''}</div>`;
       html += `<div class="chart">${histogram(r.n, A, B)}</div>`;
-      html += `<div class="tbl-wrap"><table class="res-t"><thead><tr><th>Measure</th>${A ? '<th class="num">v6.3</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
+      html += `<div class="tbl-wrap"><table class="res-t"><thead><tr><th>Measure</th>${A ? '<th class="num">v6.4</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
       for (const mt of METRICS) {
         const a = A ? mt.get(A) : NaN, b = B ? mt.get(B) : NaN;
         html += `<tr><th scope="row"${mt.hint ? ` title="${esc(mt.hint)}"` : ''}>${mt.label}</th>${A ? `<td class="num">${fmtNum(a, mt.fmt, mt.unit)}</td>` : ''}${B ? `<td class="num">${fmtNum(b, mt.fmt, mt.unit)}</td>` : ''}${A && B ? `<td>${deltaHTML(a, b, mt.fmt, mt.unit)}</td>` : ''}</tr>`;
@@ -293,7 +297,7 @@
       const keys = Object.keys(D.GLADIATORS);
       const wr = (m, k) => (m && m.gladSeen[k] ? (100 * (m.gladWins[k] || 0)) / m.gladSeen[k] : NaN);
       const fair = 100 / r.n;
-      html += `<details><summary>Gladiator win rates <span class="muted">(fair share at ${r.n} players: ${fair.toFixed(0)}%)</span></summary><div class="tbl-wrap"><table class="res-t"><thead><tr><th>Gladiator</th>${A ? '<th class="num">v6.3</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
+      html += `<details><summary>Gladiator win rates <span class="muted">(fair share at ${r.n} players: ${fair.toFixed(0)}%)</span></summary><div class="tbl-wrap"><table class="res-t"><thead><tr><th>Gladiator</th>${A ? '<th class="num">v6.4</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
       for (const k of keys) {
         const a = wr(A, k), b = wr(B, k);
         const ref = Number.isFinite(b) ? b : a;
@@ -305,14 +309,14 @@
       const wkeys = Object.keys(D.CARDS).filter((k) => D.CARDS[k].type === 'weapon');
       const wu = (m, k) => (m ? (100 * (m.weap[k] || 0)) / m.samples : NaN);
       wkeys.sort((x, y) => (wu(B || A, y) || 0) - (wu(B || A, x) || 0));
-      html += `<details><summary>Weapon usage <span class="muted">(% of Gladiator-turns with it equipped)</span></summary><div class="tbl-wrap"><table class="res-t"><thead><tr><th>Weapon</th>${A ? '<th class="num">v6.3</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
+      html += `<details><summary>Weapon usage <span class="muted">(% of Gladiator-turns with it equipped)</span></summary><div class="tbl-wrap"><table class="res-t"><thead><tr><th>Weapon</th>${A ? '<th class="num">v6.4</th>' : ''}${B ? '<th class="num">Variant</th>' : ''}${A && B ? '<th>Change</th>' : ''}</tr></thead><tbody>`;
       for (const k of wkeys) {
         const a = wu(A, k), b = wu(B, k);
         html += `<tr><th scope="row">${D.CARDS[k].name}</th>${A ? `<td class="num">${fmtNum(a, 1, '%')}</td>` : ''}${B ? `<td class="num">${fmtNum(b, 1, '%')}</td>` : ''}${A && B ? `<td>${deltaHTML(a, b, 1, '%')}</td>` : ''}</tr>`;
       }
       html += '</tbody></table></div></details></section>';
     }
-    if (!compare) html += '<p class="muted">Only your variant was run. Tick "Compare with v6.3" to see the differences.</p>';
+    if (!compare) html += '<p class="muted">Only your variant was run. Tick "Compare with v6.4" to see the differences.</p>';
     out.innerHTML = html;
     $('btn-copy').onclick = copyResults;
   }
@@ -323,7 +327,7 @@
     const ch = Object.entries(overrides);
     lines.push(ch.length ? 'Changes: ' + ch.map(([k, v]) => `${FIELDS.find((f) => f.id === k).label} ${DEFAULTS[k]} -> ${v}`).join('; ') : 'Changes: none');
     for (const r of results) {
-      lines.push('', `${r.n} players`, ['Measure', r.A ? 'v6.3' : null, r.B ? 'Variant' : null].filter(Boolean).join(' | '));
+      lines.push('', `${r.n} players`, ['Measure', r.A ? 'v6.4' : null, r.B ? 'Variant' : null].filter(Boolean).join(' | '));
       for (const mt of METRICS) lines.push([mt.label, r.A ? fmtNum(mt.get(r.A), mt.fmt, mt.unit) : null, r.B ? fmtNum(mt.get(r.B), mt.fmt, mt.unit) : null].filter((x) => x != null).join(' | '));
     }
     return lines.join('\n');
@@ -383,7 +387,7 @@
     const t0 = performance.now();
     for (const n of counts) {
       const r = { n };
-      if (compare) { r.A = await runBatch({}, n, games, seed + n, step(`${n} players · v6.3`)); done += games; }
+      if (compare) { r.A = await runBatch({}, n, games, seed + n, step(`${n} players · v6.4`)); done += games; }
       r.B = await runBatch(overrides, n, games, seed + n, step(`${n} players · variant`)); done += games;
       results.push(r);
       if (cancelled) break;

@@ -1,4 +1,4 @@
-/* Gladiator v6.3 — computer opponents. Simple heuristics, no cheating (it never looks at hidden hands or decks). */
+/* Gladiator v6.4 — computer opponents. Simple heuristics, no cheating (it never looks at hidden hands or decks). */
 (function (root) {
   'use strict';
   const { CARDS, GLADIATORS, RULES } = root.GLAD_DATA;
@@ -210,6 +210,18 @@
         if (s > bs) { bs = s; bi = i; }
       });
       return bi;
+    },
+
+    /** Bribe the Lanista when the chosen target is clearly better than a random card: a likely kill, or spare gold. */
+    wantsBribe(game, p, others) {
+      const t = AI.pickTarget(game, p, others);
+      const dmg = expAttack(p.glad.key, p.glad.equipped, t.glad.key, t.glad.equipped);
+      const left = game.neighbor(p, +1), right = game.neighbor(p, -1);
+      const randomIsFine = t === left && t === right;
+      if (randomIsFine) return false;
+      if (t.glad.vita <= dmg * 1.5) return true;          // good chance to finish them
+      if (t.laurels >= 2 && p.gold >= 50) return true;    // stop the leader
+      return p.gold >= 90;                                // nothing better to spend on
     },
 
     pickTarget(game, p, cands) {

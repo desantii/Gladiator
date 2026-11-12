@@ -1,4 +1,4 @@
-/* Gladiator v6.3 — rules engine. No DOM: talks to the outside through an `io` object:
+/* Gladiator v6.4 — rules engine. No DOM: talks to the outside through an `io` object:
  *   io.log(msg, cls)                 append to game log
  *   io.update()                      state changed, re-render
  *   io.delay(ms)                     pacing (Promise)
@@ -641,6 +641,15 @@
         target = others[0];
       } else if (turner) {
         target = await this.chooseTarget(p, others, `Turned Blade: choose ${p.name}'s target`, turner);
+      } else if (p.gold >= RULES.bribeCost && await this.ask(p, {
+        title: `${p.name}: bribe the Lanista?`,
+        text: `Pay ${RULES.bribeCost} denarii to attack a Gladiator of your choice instead of drawing an Attack card. You must decide before drawing. You have ${p.gold} denarii.`,
+        options: [{ label: 'Draw an Attack card', value: false }, { label: `💰 Pay ${RULES.bribeCost} and choose my target`, value: true }],
+      }, () => this.AI.wantsBribe(this, p, others))) {
+        p.gold -= RULES.bribeCost;
+        this.log(`💰 ${p.name} bribes the Lanista (${RULES.bribeCost} denarii) to choose their opponent.`);
+        this.update();
+        target = await this.chooseTarget(p, others, `${p.name}: choose your target (bribe)`);
       } else {
         const c = this.attackDeck.draw();
         const ad = ATTACK_CARDS[c.key];

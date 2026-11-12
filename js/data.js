@@ -1,4 +1,4 @@
-/* Gladiator v6.3 — card data, taken from the rules manual (docs/rules-v6.3.md). */
+/* Gladiator v6.4 — card data, taken from the rules manual (docs/rules-v6.4.md). */
 (function (root) {
   'use strict';
 
@@ -160,6 +160,7 @@
     restlessDmg: 10,
     archerTurn: 15, // the Emperor's archers fire once
     archerDmg: 30,
+    bribeCost: 30, // Bribe the Lanista
     laurelsToWin: 3,
     dodgeMin: 1,
     dodgeMax: 4,
