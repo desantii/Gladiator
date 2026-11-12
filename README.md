@@ -43,7 +43,7 @@ Playtest changes not yet in the printed manual:
 - **Lorica Segmentata:** buy 55 → **70**, sell 30 → **35**.
 - **Invictus:** dodge 3 → **2** (VITA stays 120). At dodge 3 it won about 52% of 4-player arenas; at dodge 2, about 36%.
 
-The printed Scutum and Lorica Segmentata card art still shows the old prices, and the Invictus card still shows dodge 3.
+The Scutum, Lorica Segmentata and Invictus card art has been updated to match.
 
 ## Interpretations
 
