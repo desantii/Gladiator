@@ -1,5 +1,7 @@
 # Card art
 
+All 40 gladiator and equipment cards are in place (final versions). `web/` holds the 560px WebP copies the game loads; regenerate them if a card changes. Attack, Hades and card-back art can be added the same way.
+
 Put card images in this folder. Finished cards (with name, text and stats printed on them) are fine.
 
 Name each file after its card, in lower case, e.g. `vulgaris.png`. PNG, JPG and WebP all work.

@@ -146,6 +146,14 @@ h3 .sub { text-transform: none; letter-spacing: 0; color: var(--muted); font-siz
 .card .btn.ghost:hover { background: #fff6e2; }
 .card.new { animation: pop .5s ease-out; }
 .card.equipped { box-shadow: 0 3px 8px #0008, inset 0 0 0 1px var(--cc), 0 0 0 2px var(--bronze); }
+.card.has-face { padding: 0; border: 0; background: none; box-shadow: none; gap: 6px; }
+.card.has-face .card-face { width: 100%; border-radius: 8px; box-shadow: 0 3px 8px #000a; display: block; }
+.card.has-face.equipped .card-face { outline: 2px solid var(--bronze); outline-offset: 1px; }
+.card.has-face .c-actions { justify-content: center; margin-top: 0; }
+.card.has-face .btn.ghost { color: var(--text); border-color: var(--line); background: transparent; }
+.face-btn { padding: 0; border: 0; background: none; cursor: zoom-in; display: block; width: 100%; border-radius: 8px; }
+.face-btn:focus-visible { outline: 2px solid var(--bronze2); outline-offset: 2px; }
+.lock-badge { position: absolute; top: 6px; left: 6px; background: #000c; border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; font-size: 12px; }
 .stage .stage-card { width: 170px; margin: 0 auto 4px; text-align: left; }
 .stage .stage-card .c-art { height: 44px; }
 @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }

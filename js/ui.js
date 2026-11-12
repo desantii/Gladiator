@@ -36,6 +36,7 @@
   function tooltip(d) {
     return `${d.name} (${d.en}) — ${statLine(d)}. ${d.text}${d.buy ? ` Buy ${d.buy}.` : ' Draw only.'} Sell ${d.sell}.`;
   }
+  const FACES = window.GLAD_CARD_FACES || {};
   const TIMING = { aqua: 'ANY TIME', volumen: 'ANY TIME', harena: 'BEFORE ATTACK', furor: 'BEFORE ATTACK', interceptio: 'EQUIP PHASE', fortuna: 'EQUIP PHASE' };
   const LOC = { off: 'OFF HAND', body: 'BODY', head: 'HEAD', arm: 'ARM', legs: 'LEGS' };
   function typeLine(d, key) {
@@ -70,7 +71,10 @@
     const el = document.createElement('div');
     el.className = `card cat-${d.cat}${extraClass ? ' ' + extraClass : ''}`;
     el.title = tooltip(d);
-    el.innerHTML = faceHTML({
+    if (FACES[c.key]) {
+      el.classList.add('has-face');
+      el.innerHTML = `<button class="face-btn" data-zoom="${c.key}" aria-label="View the ${esc(d.name)} card">${faceImg(c.key)}</button>${c.locked ? '<span class="lock-badge" title="Locked: cannot be unequipped or sold">🔒</span>' : ''}`;
+    } else el.innerHTML = faceHTML({
       type: typeLine(d, c.key), name: d.name, sub: d.en, count: d.count, key: c.key, icon: d.icon, text: d.text,
       footL: `${d.buy ? `BUY ${d.buy} · ` : ''}SELL ${d.sell}${c.locked ? ' · 🔒' : ''}`, footR: footRight(d),
     });
@@ -90,10 +94,14 @@
     }
     return el;
   }
-  const FACES = window.GLAD_CARD_FACES || {};
+  function faceImg(key) {
+    const g = GLADIATORS[key], d = CARDS[key];
+    const alt = g ? `${g.name} card: ${g.text} VITA ${g.vita}, dodge ${g.dodge || 'never'}.` : `${d.name} card: ${statLine(d)}. ${d.text}`;
+    return `<img class="card-face" src="${esc(FACES[key])}" alt="${esc(alt)}" loading="lazy" decoding="async">`;
+  }
   function gladCardHTML(key) {
     const g = GLADIATORS[key];
-    if (FACES[key]) return `<img class="card-face" src="${esc(FACES[key])}" alt="${esc(g.name)} card: ${esc(g.text)} VITA ${g.vita}, dodge ${g.dodge || 'never'}.">`;
+    if (FACES[key]) return faceImg(key);
     return `<div class="card cat-gladiator">${faceHTML({ type: 'GLADIATOR', name: g.name, count: g.count, key, icon: g.icon, text: g.text, footL: `DODGE ${g.dodge || 'NEVER'}`, footR: `VITA ${g.vita}` })}</div>`;
   }
 
@@ -528,10 +536,15 @@
 
   function showFace(key) {
     if (!$('modal').classList.contains('hidden')) return; // never cover a decision the game is waiting on
-    const box = openModal(`<div class="face-view">${gladCardHTML(key)}</div><div class="mopts"><button class="btn" id="face-close">Close</button></div>`);
+    if (!FACES[key]) return;
+    const box = openModal(`<div class="face-view">${faceImg(key)}</div><div class="mopts"><button class="btn" id="face-close">Close</button></div>`);
     box.classList.add('face-box');
     box.querySelector('#face-close').onclick = closeModal;
   }
+  document.addEventListener('click', (e) => {
+    const z = e.target.closest('[data-zoom]');
+    if (z && !z.closest('#modal')) { showFace(z.dataset.zoom); return; }
+  });
   $('players').addEventListener('click', (e) => {
     const t = e.target.closest('[data-face]');
     if (t) showFace(t.dataset.face);

@@ -1,13 +1,48 @@
-/* Card images. Finished card faces (name, text and stats printed on the image) go in GLAD_CARD_FACES;
- * illustration-only art for the in-game card frame goes in GLAD_ART. Keys are card keys from data.js. */
+/* Card images: finished card faces (name, art, text and stats printed on the image), keyed by the
+ * card keys in data.js. Gladiator, weapon, armor, special and legendary cards. Cards without an entry
+ * fall back to the in-game card frame. */
 (function (root) {
   root.GLAD_CARD_FACES = {
-    vulgaris: 'art/web/vulgaris.webp',
-    velox: 'art/web/velox.webp',
+    amazonia: 'art/web/amazonia.webp',
+    aqua: 'art/web/aqua.webp',
     bestia: 'art/web/bestia.webp',
-    retiarius: 'art/web/retiarius.webp',
-    invictus: 'art/web/invictus.webp',
+    canis: 'art/web/canis.webp',
+    cassis: 'art/web/cassis.webp',
+    cerberus: 'art/web/cerberus.webp',
+    clava: 'art/web/clava.webp',
     debilis: 'art/web/debilis.webp',
+    ensis: 'art/web/ensis.webp',
+    flagrum: 'art/web/flagrum.webp',
+    fortuna: 'art/web/fortuna.webp',
+    fulgur: 'art/web/fulgur.webp',
+    furor: 'art/web/furor.webp',
+    galea: 'art/web/galea.webp',
+    gladius: 'art/web/gladius.webp',
+    harena: 'art/web/harena.webp',
+    hasta: 'art/web/hasta.webp',
+    hephaesti: 'art/web/hephaesti.webp',
+    interceptio: 'art/web/interceptio.webp',
+    invictus: 'art/web/invictus.webp',
+    leo: 'art/web/leo.webp',
+    manica: 'art/web/manica.webp',
+    ocreae: 'art/web/ocreae.webp',
+    parma: 'art/web/parma.webp',
+    pilum: 'art/web/pilum.webp',
+    pugio: 'art/web/pugio.webp',
+    rete: 'art/web/rete.webp',
+    retiarius: 'art/web/retiarius.webp',
+    scutum: 'art/web/scutum.webp',
+    segmentata: 'art/web/segmentata.webp',
+    sica: 'art/web/sica.webp',
+    spatha: 'art/web/spatha.webp',
+    squamata: 'art/web/squamata.webp',
+    subarmalis: 'art/web/subarmalis.webp',
+    talaria: 'art/web/talaria.webp',
+    tridens: 'art/web/tridens.webp',
+    ursus: 'art/web/ursus.webp',
+    velox: 'art/web/velox.webp',
+    volumen: 'art/web/volumen.webp',
+    vulgaris: 'art/web/vulgaris.webp',
   };
   root.GLAD_ART = root.GLAD_ART || {};
 })(typeof window !== 'undefined' ? window : globalThis);
