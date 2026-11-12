@@ -33,6 +33,17 @@ Run the simulation with `node tests/simulate.js 300`.
 - Card counts and texts: v6.3 print sheets, including the 30 unique Hades cards and the Attack deck split (9 Left, 9 Right, 6 Your Choice, 6 Pass).
 - Card art: none yet. Each card shows an emoji in its art box. To add art, map card keys to image paths in `window.GLAD_ART`, e.g. `{ pugio: 'art/pugio.png' }`, loaded before `js/data.js`.
 
+## Changes after v6.4
+
+Playtest changes not yet in the printed manual:
+
+- **Laurels to win:** 3 with 2–3 players, **2 with 4 or more**.
+- **Gladius** 9 → **8** copies; **Sica** 3 → **4** copies.
+- **Scutum:** buy 35 → **45**, sell 20 → **25**.
+- **Lorica Segmentata:** buy 55 → **70**, sell 30 → **35**.
+
+The printed Scutum and Lorica Segmentata card art still shows the old prices.
+
 ## Interpretations
 
 The crowd, archers, Furor Mortis and Bribe the Lanista rules below come from the v6.4 manual; the rest are this version's readings of details the rules leave open:

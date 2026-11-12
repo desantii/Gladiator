@@ -17,11 +17,11 @@
     // ---------- Weapons (51) ----------
     pugio: { name: 'Pugio', en: 'Dagger', type: 'weapon', cat: 'weapon', atk: 15, hands: 1, buy: 20, sell: 10, count: 7, icon: '🗡️',
       text: "If the defending Gladiator has fewer than 30 VITA, double this weapon's ATK before subtracting armor." },
-    gladius: { name: 'Gladius', en: 'Short Sword', type: 'weapon', cat: 'weapon', atk: 50, hands: 1, buy: 40, sell: 20, count: 9, icon: '⚔️',
+    gladius: { name: 'Gladius', en: 'Short Sword', type: 'weapon', cat: 'weapon', atk: 50, hands: 1, buy: 40, sell: 20, count: 8, icon: '⚔️',
       text: 'Cannot be paired with a Tridens.' },
     pilum: { name: 'Pilum', en: 'Spear', type: 'weapon', cat: 'weapon', atk: 50, hands: 1, buy: 60, sell: 30, count: 5, icon: '🏑', ignoreLocs: ['off', 'body'],
       text: "Ignores the defender's shield and body armor." },
-    sica: { name: 'Sica', en: 'Curved Blade', type: 'weapon', cat: 'weapon', atk: 45, hands: 1, buy: 45, sell: 25, count: 3, icon: '🌙', ignoreLocs: ['off', 'arm'],
+    sica: { name: 'Sica', en: 'Curved Blade', type: 'weapon', cat: 'weapon', atk: 45, hands: 1, buy: 45, sell: 25, count: 4, icon: '🌙', ignoreLocs: ['off', 'arm'],
       text: "Ignores the defender's shield and arm armor." },
     clava: { name: 'Clava', en: 'Spiked Club', type: 'weapon', cat: 'weapon', atk: 40, hands: 1, buy: 45, sell: 25, count: 3, icon: '🏏', halfArmor: true,
       text: 'Armor counts half against this weapon (round up to the nearest 5).' },
@@ -48,10 +48,10 @@
     cassis: { name: 'Cassis', en: 'Helmet', type: 'armor', cat: 'armor', def: 20, loc: 'head', helmet: true, buy: 10, sell: 5, count: 4, icon: '⛑️', text: "No special ability." },
     galea: { name: 'Galea', en: 'Visored Helmet', type: 'armor', cat: 'armor', def: 25, loc: 'head', helmet: true, buy: 25, sell: 15, count: 4, icon: '🪖', ignoresRete: true,
       text: "Ignores the Rete's dodge reduction effect." },
-    scutum: { name: 'Scutum', en: 'Large Shield', type: 'armor', cat: 'armor', def: 35, loc: 'off', shield: true, buy: 35, sell: 20, count: 4, icon: '🛡️', text: 'Occupies the off-hand weapon slot.' },
+    scutum: { name: 'Scutum', en: 'Large Shield', type: 'armor', cat: 'armor', def: 35, loc: 'off', shield: true, buy: 45, sell: 25, count: 4, icon: '🛡️', text: 'Occupies the off-hand weapon slot.' },
     squamata: { name: 'Lorica Squamata', en: 'Scale Armor', type: 'armor', cat: 'armor', def: 35, loc: 'body', buy: 40, sell: 20, count: 3, icon: '🐉', autoReduce: 10,
       text: "Reduces auto-hit damage by 10." },
-    segmentata: { name: 'Lorica Segmentata', en: 'Plate Armor', type: 'armor', cat: 'armor', def: 45, loc: 'body', buy: 55, sell: 30, count: 2, icon: '🏛️', autoReduce: 20,
+    segmentata: { name: 'Lorica Segmentata', en: 'Plate Armor', type: 'armor', cat: 'armor', def: 45, loc: 'body', buy: 70, sell: 35, count: 2, icon: '🏛️', autoReduce: 20,
       text: "Reduces auto-hit damage by 20." },
 
     // ---------- Specials (24) — draw only ----------
@@ -161,7 +161,8 @@
     archerTurn: 15, // the Emperor's archers fire once
     archerDmg: 30,
     bribeCost: 30, // Bribe the Lanista
-    laurelsToWin: 3,
+    laurelsToWin: 3,      // up to 3 players
+    laurelsToWinBig: 2,   // 4 or more players
     dodgeMin: 1,
     dodgeMax: 4,
   };

@@ -442,9 +442,9 @@
     let n = 4;
     const box = openModal(`
       <h2>⚔️ Gladiator</h2>
-      <div class="mtext">Command your Gladiator, equip weapons and armor, and be the last one standing. Win <b>3 arenas</b> to be crowned Champion.</div>
+      <div class="mtext">Command your Gladiator, equip weapons and armor, and be the last one standing. Win <b>3 arenas</b> (2 with 4 or more players) to be crowned Champion.</div>
       <div class="mtext"><label>Players <select id="su-n">${[2, 3, 4, 5, 6].map((k) => `<option ${k === n ? 'selected' : ''}>${k}</option>`).join('')}</select></label>
-        &nbsp; <label>Laurels to win <select id="su-l"><option value="3" selected>3 (standard)</option><option value="2">2 (shorter)</option><option value="1">1 (single arena)</option></select></label></div>
+        &nbsp; <label>Laurels to win <select id="su-l"><option value="0" selected>Standard (3, or 2 with 4+ players)</option><option value="3">3</option><option value="2">2</option><option value="1">1 (single arena)</option></select></label></div>
       <div id="su-rows"></div>
       <div class="mopts" style="flex-direction:row;gap:8px;margin-top:14px;flex-wrap:wrap">
         <button class="btn" id="su-go">Enter the arena</button>
@@ -483,7 +483,7 @@
     const box = openModal(`
       <div class="rules">
       <h2>Rules of the Arena (v6.4)</h2>
-      <p><b>Goal.</b> Be the last Gladiator standing to win an arena and earn a laurel. The first player to 3 laurels is Champion.</p>
+      <p><b>Goal.</b> Be the last Gladiator standing to win an arena and earn a laurel. The first player to 3 laurels is Champion; with 4 or more players, the first to 2.</p>
       <h4>Each turn</h4>
       <p><b>1. Equip Phase</b> (each player in turn order): collect <b>${RULES.income} denarii</b>; sell any cards for their printed sell value (50%); optionally pay <b>20</b> to refresh the 3-card Market (before drawing or buying); then <b>draw 1 free card OR buy up to 2</b> from the Market; finally arrange your equipment. It is locked until your next Equip Phase.</p>
       <p><b>2. Attack Phase</b> (turn order): living Gladiators draw an Attack card (Left / Right / Your Choice / Pass) and attack. <b>Bribe the Lanista:</b> before drawing, you may pay ${RULES.bribeCost} denarii to attack a Gladiator of your choice instead (not in 2-player games). In a 2-player game there are no Attack cards: you always attack each other. Dead Gladiators draw a Hades card instead.</p>
@@ -523,7 +523,7 @@
     $('log').innerHTML = '';
     stage('<div class="stage-inner">The crowd roars…</div>');
     const io = makeIO(state.gen);
-    const g = new Game({ players, laurelsToWin: laurelsToWin || 3 }, io);
+    const g = new Game({ players, laurelsToWin: laurelsToWin || 0 }, io);
     state.game = g;
     const gen = state.gen;
     render();

@@ -26,8 +26,8 @@
   add('rules', 'archerDmg', 'Archer damage', R, 'archerDmg');
   add('rules', 'bribeCost', 'Bribe the Lanista cost', R, 'bribeCost');
   add('rules', 'dodgeMax', 'Dodge cap', R, 'dodgeMax', { step: 1, min: 1 });
-  const META = { laurelsToWin: 3 };
-  add('rules', 'laurelsToWin', 'Laurels to win', META, 'laurelsToWin', { step: 1, min: 1 });
+  add('rules', 'laurelsToWin', 'Laurels to win (2–3 players)', R, 'laurelsToWin', { step: 1, min: 1 });
+  add('rules', 'laurelsToWinBig', 'Laurels to win (4+ players)', R, 'laurelsToWinBig', { step: 1, min: 1 });
 
   for (const [k, g] of Object.entries(D.GLADIATORS)) {
     add('glad', `${k}-vita`, `${g.name} VITA`, g, 'vita', { row: k, col: 'VITA' });
@@ -141,7 +141,7 @@
     };
     for (let i = 0; i < games; i++) {
       if (cancelled) break;
-      const g = new Game({ players: Array.from({ length: nPlayers }, (_, k) => ({ name: 'AI' + k, ai: true })), laurelsToWin: META.laurelsToWin }, quiet, mulberry(seed * 100003 + i));
+      const g = new Game({ players: Array.from({ length: nPlayers }, (_, k) => ({ name: 'AI' + k, ai: true })) }, quiet, mulberry(seed * 100003 + i));
       let total = 0;
       const oEquip = g.equipPhase.bind(g);
       g.equipPhase = async () => {

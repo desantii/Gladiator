@@ -73,7 +73,7 @@
       this.io = io;
       this.rng = rng || Math.random;
       this.players = cfg.players.map((p, i) => ({ id: i, name: p.name, isAI: !!p.ai, hand: [], gold: 0, laurels: 0, glad: null }));
-      this.laurelsToWin = cfg.laurelsToWin || RULES.laurelsToWin;
+      this.laurelsToWin = cfg.laurelsToWin || (this.players.length >= 4 ? RULES.laurelsToWinBig : RULES.laurelsToWin);
       this.maxTurns = cfg.maxTurns || 150;
       this.arena = 0;
       this.turn = 0;
