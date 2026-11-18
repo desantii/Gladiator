@@ -193,6 +193,16 @@
         stage(`<div><span class="coin flipping${heads ? '' : ' tails'}">${heads ? 'HEADS' : 'TAILS'}</span><div class="lbl">Sacred Coin</div><div class="why">${esc(label)}</div></div>`);
         await wait(1200 * state.speed);
       },
+      async showPack(a, t) {
+        if (!live()) return never();
+        stage(`<div class="pack-moment" role="img" aria-label="Pack Hunt"><div class="pack-dogs">${FACES.canis ? `<span class="dog left art" style="background-image:url('${esc(FACES.canis)}')"></span><span class="dog right art" style="background-image:url('${esc(FACES.canis)}')"></span>` : '<span class="dog left">🐕</span><span class="dog right">🐕</span>'}</div><div class="pack-title">PACK HUNT!</div><div class="why">${esc(a.name)}'s war dogs strike ${esc(t.name)}: +${RULES.packBonus} damage, armor ignored</div></div>`);
+        $('stage').classList.remove('pack-flash'); void $('stage').offsetWidth; $('stage').classList.add('pack-flash');
+        await wait(1400 * state.speed);
+      },
+      packFormed(p) {
+        if (!live() || p.isAI) return;
+        toast(`🐕🐕 The pack is together! Pack Hunt: +${RULES.packBonus} damage that ignores armor.`, true);
+      },
       async showCard(kind, d, p) {
         if (!live()) return never();
         if (kind === 'crowd') {

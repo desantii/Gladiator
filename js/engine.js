@@ -425,9 +425,11 @@
       if (!isGear(d)) return `${d.name} is used, not equipped.`;
       const cur = p.glad.equipped;
       let err = loadoutError(p.glad.key, [...cur, card]);
+      const packBefore = this.packCount(p);
       if (!err) {
         p.hand.splice(i, 1);
         cur.push(card);
+        this.notePack(p, packBefore);
         this.update();
         return null;
       }
@@ -441,6 +443,7 @@
           p.hand.splice(i, 1);
           p.glad.equipped = next;
           p.hand.push(...rm);
+          this.notePack(p, packBefore);
           this.update();
           return null;
         }
@@ -459,6 +462,15 @@
       return null;
     }
 
+    packCount(p) { return p.glad.equipped.filter((c) => def(c).pack).length; }
+
+    /** Announce when a Gladiator's second Canis completes the pack. */
+    notePack(p, before) {
+      if (!RULES.packBonus || before >= 2 || this.packCount(p) !== 2) return;
+      this.log(`🐕🐕 ${p.name}'s war dogs form a pack! <b>Pack Hunt</b>: +${RULES.packBonus} damage that ignores armor.`, 'crit');
+      this.io.packFormed?.(p);
+    }
+
     /** Replace the whole loadout (used by the AI). `items` must be cards owned by p. */
     setLoadout(p, items) {
       if (this.equipState && this.equipState.player === p && this.equipState.haunted) return 'Haunted Dreams: you cannot equip this phase.';
@@ -466,8 +478,10 @@
       if (err) return err;
       const all = [...p.hand, ...p.glad.equipped];
       if (p.glad.equipped.some((c) => c.locked && !items.includes(c))) return 'Locked card missing.';
+      const packBefore = this.packCount(p);
       p.glad.equipped = items.slice();
       p.hand = all.filter((c) => !items.includes(c));
+      this.notePack(p, packBefore);
       this.update();
       return null;
     }
@@ -749,6 +763,7 @@
       let dmg = this.computeDamage(a, t, r.auto);
       this.log(`${a.name} rolls ${rollText} against ${t.name}'s dodge ${r.dodge}: <b>${r.auto ? 'AUTO-HIT' : 'hit'}</b> for <b>${dmg.total}</b> damage${dmg.detail ? ` (${dmg.detail})` : ''}.`, r.auto ? 'crit' : 'hit');
       let total = dmg.total;
+      if (dmg.pack) await this.io.showPack?.(a, t);
 
       if (this.has(t, 'hephaesti') && !t.glad.hephUsed && total > 0) {
         const use = await this.ask(t, {
@@ -803,7 +818,8 @@
       }
       if (ws.every((w) => !w.beast && !w.atk)) { normal += RULES.fists; parts.push('fists 10'); }
       // Pack Hunt: two Canis add bonus damage that also ignores armor.
-      if (RULES.packBonus && ws.filter((w) => w.pack).length === 2) { ignore += RULES.packBonus; parts.push(`Pack Hunt +${RULES.packBonus}`); }
+      const pack = !!(RULES.packBonus && ws.filter((w) => w.pack).length === 2);
+      if (pack) { ignore += RULES.packBonus; parts.push(`Pack Hunt +${RULES.packBonus}`); }
       if (a.glad.key === 'bestia') { normal += 10; parts.push('Bestia +10'); }
 
       if (auto) {
@@ -814,7 +830,7 @@
         if (red) parts.push(`auto-hit reduced by ${red}`);
         total = Math.max(5, ceil5(total - red));
         parts.push('armor ignored');
-        return { total, detail: parts.join(', ') };
+        return { total, detail: parts.join(', '), pack };
       }
       const armor = Math.max(0, this.totalDef(t) - (t.glad.debuff.armorPhase || 0));
       let ignored = 0;
@@ -823,7 +839,7 @@
       if (half) eff = ceil5(eff / 2);
       if (armor) parts.push(`armor ${armor}${eff !== armor ? `→${eff}` : ''}`);
       const total = Math.max(5, ceil5(Math.max(0, normal - eff) + ignore));
-      return { total, detail: parts.join(', ') };
+      return { total, detail: parts.join(', '), pack };
     }
 
     async takeDamage(p, dmg, src) {
