@@ -802,6 +802,8 @@
         if (w.halfArmor) half = true;
       }
       if (ws.every((w) => !w.beast && !w.atk)) { normal += RULES.fists; parts.push('fists 10'); }
+      // Pack Hunt: two Canis add bonus damage that also ignores armor.
+      if (RULES.packBonus && ws.filter((w) => w.pack).length === 2) { ignore += RULES.packBonus; parts.push(`Pack Hunt +${RULES.packBonus}`); }
       if (a.glad.key === 'bestia') { normal += 10; parts.push('Bestia +10'); }
 
       if (auto) {

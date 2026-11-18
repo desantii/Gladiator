@@ -41,6 +41,8 @@ Playtest changes not yet in the printed manual:
 - **Gladius** 9 → **8** copies; **Sica** 3 → **4** copies.
 - **Scutum:** buy 35 → **45**, sell 20 → **25**.
 - **Lorica Segmentata:** buy 55 → **70**, sell 30 → **35**.
+- **Pugio** 7 → **6** copies; **Canis** 3 → **4** copies (weapon total stays 51).
+- **Pack Hunt:** if both your weapons are Canis, add 20 damage. This damage also ignores armor.
 - **Invictus:** dodge 3 → **2** (VITA stays 120). At dodge 3 it won about 52% of 4-player arenas; at dodge 2, about 36%.
 
 The Scutum, Lorica Segmentata and Invictus card art has been updated to match.

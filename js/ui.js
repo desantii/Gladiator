@@ -500,7 +500,7 @@
       <table><tr><th>Gladiator</th><th>VITA</th><th>Dodge</th><th>Special</th></tr>
       ${Object.values(GLADIATORS).map((g) => `<tr><td>${g.icon} ${g.name}</td><td>${g.vita}</td><td>${g.dodge || 'never'}</td><td>${esc(g.text)}</td></tr>`).join('')}</table>
       <h4>Equipment</h4>
-      <p>Two weapon slots (main and off-hand). Two-handed weapons use both; shields use the off-hand. One armor piece per location. Specials and Legendaries are draw-only (never in the Market), and you may carry only 1 Legendary equipped.</p>
+      <p>Two weapon slots (main and off-hand). Two-handed weapons use both; shields use the off-hand. One armor piece per location. Specials and Legendaries are draw-only (never in the Market), and you may carry only 1 Legendary equipped. <b>Pack Hunt:</b> if both your weapons are Canis, add ${RULES.packBonus} damage; this damage also ignores armor.</p>
       <table><tr><th>Card</th><th>Stats</th><th>Buy/Sell</th><th>Effect</th></tr>
       ${Object.values(CARDS).map((d) => `<tr><td>${d.icon} ${d.name}</td><td>${statLine(d)}</td><td>${d.buy || '—'}/${d.sell}</td><td>${esc(d.text)}</td></tr>`).join('')}</table>
       <h4>Notes on this digital edition</h4>

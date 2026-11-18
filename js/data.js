@@ -15,7 +15,7 @@
   // type: weapon | armor | special | relic   ·   cat: weapon | armor | special | legendary
   const CARDS = {
     // ---------- Weapons (51) ----------
-    pugio: { name: 'Pugio', en: 'Dagger', type: 'weapon', cat: 'weapon', atk: 15, hands: 1, buy: 20, sell: 10, count: 7, icon: '🗡️',
+    pugio: { name: 'Pugio', en: 'Dagger', type: 'weapon', cat: 'weapon', atk: 15, hands: 1, buy: 20, sell: 10, count: 6, icon: '🗡️',
       text: "If the defending Gladiator has fewer than 30 VITA, double this weapon's ATK before subtracting armor." },
     gladius: { name: 'Gladius', en: 'Short Sword', type: 'weapon', cat: 'weapon', atk: 50, hands: 1, buy: 40, sell: 20, count: 8, icon: '⚔️',
       text: 'Cannot be paired with a Tridens.' },
@@ -37,8 +37,8 @@
       text: "Damage 10-60. Ignores armor. Reduces opponent's dodge by 1 for this attack." },
     ursus: { name: 'Ursus', en: 'Bear', type: 'weapon', cat: 'weapon', beast: 8, hands: 1, buy: 50, sell: 25, count: 3, icon: '🐻', autoReduceOwn: 10,
       text: "Damage 8-48. Reduces auto-hit damage by 10." },
-    canis: { name: 'Canis', en: 'War Dog', type: 'weapon', cat: 'weapon', beast: 5, hands: 1, buy: 45, sell: 25, count: 3, icon: '🐕', ignoreArmor: true,
-      text: "Damage 5-30. Ignores armor." },
+    canis: { name: 'Canis', en: 'War Dog', type: 'weapon', cat: 'weapon', beast: 5, hands: 1, buy: 45, sell: 25, count: 4, icon: '🐕', ignoreArmor: true, pack: true,
+      text: "Damage 5-30. Ignores armor. Pack Hunt: if both your weapons are Canis, add 20 damage. This damage also ignores armor." },
 
     // ---------- Armor (37) ----------
     subarmalis: { name: 'Subarmalis', en: 'Padded Vest', type: 'armor', cat: 'armor', def: 20, loc: 'body', buy: 15, sell: 10, count: 7, icon: '🦺', text: "No special ability." },
@@ -161,6 +161,7 @@
     archerTurn: 15, // the Emperor's archers fire once
     archerDmg: 30,
     bribeCost: 30, // Bribe the Lanista
+    packBonus: 20, // Pack Hunt: two Canis equipped
     laurelsToWin: 3,      // up to 3 players
     laurelsToWinBig: 2,   // 4 or more players
     dodgeMin: 1,

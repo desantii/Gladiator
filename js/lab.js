@@ -25,6 +25,7 @@
   add('rules', 'archerTurn', 'Archers fire on turn', R, 'archerTurn', { step: 1, min: 1 });
   add('rules', 'archerDmg', 'Archer damage', R, 'archerDmg');
   add('rules', 'bribeCost', 'Bribe the Lanista cost', R, 'bribeCost');
+  add('rules', 'packBonus', 'Pack Hunt bonus (two Canis)', R, 'packBonus');
   add('rules', 'dodgeMax', 'Dodge cap', R, 'dodgeMax', { step: 1, min: 1 });
   add('rules', 'laurelsToWin', 'Laurels to win (2–3 players)', R, 'laurelsToWin', { step: 1, min: 1 });
   add('rules', 'laurelsToWinBig', 'Laurels to win (4+ players)', R, 'laurelsToWinBig', { step: 1, min: 1 });

@@ -27,6 +27,7 @@
       if (w.dodgeMod && !(w.isRete && td.some((d) => d.ignoresRete))) red += w.dodgeMod;
     }
     if (ws.every((w) => !w.beast && !w.atk)) normal += RULES.fists;
+    if (RULES.packBonus && ws.filter((w) => w.pack).length === 2) ignore += RULES.packBonus;
     if (aKey === 'bestia') normal += 10;
     const armor = td.reduce((s, d) => s + (d.type === 'armor' && !skip.has(d.loc) ? d.def : 0), 0);
     let eff = armor;
