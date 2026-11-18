@@ -2,7 +2,7 @@
 
 *A Card Game for 2-6 Players*
 
-V6.4
+V6.7
 
 **Welcome to the arena (Overview)**
 
@@ -17,8 +17,9 @@ luck by drawing from the deck.
 **Winning the Game**
 
 Win the arena by being the last Gladiator standing. Each arena win earns
-that player a laurel, and the first player to claim 3 laurels is crowned
-Champion of the Arena and wins the game.
+that player a laurel, and the first player to claim enough laurels is
+crowned Champion of the Arena and wins the game: 3 laurels with 2--3
+players, 2 laurels with 4--6 players.
 
 **What's in the box**
 
@@ -28,9 +29,9 @@ Champion of the Arena and wins the game.
   Gladiator cards deck (Vulgaris 8, Velox 7, Bestia   32
   7, Retiarius 3, Debilis 3, Invictus 1, Amazonia 3)  
 
-  Equipment cards deck (Weapons 51: Pugio 7, Gladius  118
-  9, Pilum 5, Sica 3, Clava 3, Tridens 5, Spatha 4,   
-  Flagrum 3, Rete 4, Leo 2, Ursus 3, Canis 3 · Armor  
+  Equipment cards deck (Weapons 51: Pugio 6, Gladius  118
+  8, Pilum 5, Sica 4, Clava 3, Tridens 5, Spatha 4,   
+  Flagrum 3, Rete 4, Leo 2, Ursus 3, Canis 4 · Armor  
   37: Subarmalis 7, Parma 5, Manica 4, Ocreae 4,      
   Cassis 4, Galea 4, Scutum 4, Lorica Squamata 3,     
   Lorica Segmentata 2 · Specials 24: Aqua Vitae 6,    
@@ -196,7 +197,8 @@ Gladiator has, your opponent then subtracts that damage from their
 health by using the tracker.
 
 If using a beast (Leo, Ursus, Canis or Cerberus), you will need to roll
-again to determine the damage they inflict.
+again to determine the damage they inflict. If you have two beasts
+equipped, roll separately for each one and add the results.
 
 **If you roll a 6**: it's an auto-hit! Add up the attack points of all
 of your weapons, your opponent takes that damage. Ignore the armor on
@@ -232,10 +234,10 @@ subarmalis would be ignored.
 
 **Example: Stacking Modifiers**
 
-Aurelia plays the Invictus Gladiator (dodges on 3) and has drawn the
+Aurelia plays the Velox Gladiator (dodges on 2) and has drawn the
 legendary Talaria Mercurii (Sandals of Mercury), which adds 2 to her
-dodge. Her dodge would become 5, but the dodge cap is 4. Her modified
-dodge range becomes **4**.
+dodge. Her dodge becomes 4, the maximum: any further bonus would be
+lost, since dodge can never exceed 4.
 
 Marcus attacks with a Rete (a net) equipped, which shrinks Aurelia\'s
 dodge by 1. Her final dodge is **3** for this attack.
@@ -359,7 +361,7 @@ Each player controls exactly one Gladiator:
                                              Retiarius back, return the Rete
                                              to the Equipment deck.
 
-  Invictus         120        3              No shields or helmets.
+  Invictus         120        2              No shields or helmets.
 
   Amazonia         70         3              Dodge reductions don\'t affect
                                              her. No two-handed weapons.
@@ -419,7 +421,9 @@ weapon. The total attack is the sum of all equipped weapon values.
                                                    auto-hit damage by 10.
 
   Canis (War     Die x 5      45        25         One-handed. Damage 5--30. Ignores
-  Dog)                                             armor.
+  Dog)                                             armor. Pack Hunt: if both your
+                                                   weapons are Canis, add 20 damage.
+                                                   This damage also ignores armor.
   -------------------------------------------------------------------------------------
 
 **Armor**
@@ -448,13 +452,13 @@ worn at a time. Ocreae are a pair and count as one Legs piece.
   Galea (Visored      Head           25        25        15         Ignores the Rete\'s
   Helmet)                                                           dodge reduction effect.
 
-  Scutum (Large       Off-hand       35        35        20         Occupies off-hand
+  Scutum (Large       Off-hand       35        45        25         Occupies off-hand
   Shield)                                                           weapon slot.
 
   Lorica Squamata     Body           35        40        20         Reduces auto-hit damage
   (Scale Armor)                                                     by 10.
 
-  Lorica Segmentata   Body           45        55        30         Reduces auto-hit damage
+  Lorica Segmentata   Body           45        70        35         Reduces auto-hit damage
   (Plate Armor)                                                     by 20.
   -----------------------------------------------------------------------------------------
 

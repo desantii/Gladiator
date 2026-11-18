@@ -1,4 +1,4 @@
-/* Gladiator v6.4 — card data, taken from the rules manual (docs/rules-v6.4.md). */
+/* Gladiator v6.7 — card data, taken from the rules manual (docs/rules-v6.7.md). */
 (function (root) {
   'use strict';
 

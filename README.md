@@ -1,6 +1,6 @@
 # Gladiator
 
-A browser version of **Gladiator**, a card game for 2–6 players, built from the v6.4 rules manual ([`docs/rules-v6.4.md`](docs/rules-v6.4.md)).
+A browser version of **Gladiator**, a card game for 2–6 players, built from the v6.7 rules manual ([`docs/rules-v6.7.md`](docs/rules-v6.7.md)).
 
 Equip your Gladiator with weapons and armor, attack with cards and dice, and be the last one standing. Win 3 arenas to be crowned Champion.
 
@@ -22,34 +22,24 @@ Open `index.html` in any modern browser. There's nothing to install or build.
 | `js/ai.js` | Computer opponents |
 | `js/ui.js`, `css/style.css`, `index.html` | Browser interface |
 | `tests/simulate.js` | Headless AI-vs-AI games that check rule invariants |
-| `lab.html`, `js/lab.js` | Balance lab: edit rules and card stats, run AI games, compare with v6.4 |
+| `lab.html`, `js/lab.js` | Balance lab: edit rules and card stats, run AI games, compare with v6.7 |
 | `art/` | Card images (see `art/README.md`) |
 
 Run the simulation with `node tests/simulate.js 300`.
 
 ## Sources
 
-- Rules: v6.4 manual ([`docs/rules-v6.4.md`](docs/rules-v6.4.md)).
+- Rules: v6.7 manual ([`docs/rules-v6.7.md`](docs/rules-v6.7.md)).
 - Card counts and texts: v6.3 print sheets, including the 30 unique Hades cards and the Attack deck split (9 Left, 9 Right, 6 Your Choice, 6 Pass).
 - Card art: none yet. Each card shows an emoji in its art box. To add art, map card keys to image paths in `window.GLAD_ART`, e.g. `{ pugio: 'art/pugio.png' }`, loaded before `js/data.js`.
 
-## Changes after v6.4
+## Since v6.4
 
-Playtest changes not yet in the printed manual:
-
-- **Laurels to win:** 3 with 2–3 players, **2 with 4 or more**.
-- **Gladius** 9 → **8** copies; **Sica** 3 → **4** copies.
-- **Scutum:** buy 35 → **45**, sell 20 → **25**.
-- **Lorica Segmentata:** buy 55 → **70**, sell 30 → **35**.
-- **Pugio** 7 → **6** copies; **Canis** 3 → **4** copies (weapon total stays 51).
-- **Pack Hunt:** if both your weapons are Canis, add 20 damage. This damage also ignores armor.
-- **Invictus:** dodge 3 → **2** (VITA stays 120). At dodge 3 it won about 52% of 4-player arenas; at dodge 2, about 36%.
-
-The Scutum, Lorica Segmentata and Invictus card art has been updated to match.
+These playtest changes are in the v6.7 manual and the game: laurels to win (3 with 2–3 players, 2 with 4–6), Gladius 8 / Sica 4 / Pugio 6 / Canis 4, Scutum 45/25, Lorica Segmentata 70/35, Invictus dodge 2, and Pack Hunt (two Canis add 20 damage that ignores armor). The card art matches.
 
 ## Interpretations
 
-The crowd, archers, Furor Mortis and Bribe the Lanista rules below come from the v6.4 manual; the rest are this version's readings of details the rules leave open:
+The crowd, archers, Furor Mortis, Bribe the Lanista and Pack Hunt rules below come from the v6.7 manual; the rest are this version's readings of details the rules leave open:
 
 - **The Crowd Grows Restless**: the crowd hurls stones. From turn 11 of an arena, at the start of each turn every living Gladiator loses 10 VITA, in turn order. It ignores armor and can't trigger Furor Mortis; the Sacred Coin flip applies as usual. If the stones eliminate everyone at once, the Gladiator with the most VITA before the stones wins the arena; a tie means no laurel.
 - **The Emperor's Archers**: on turn 15 the volley does 30 VITA instead of 10 (70 VITA lost in total by the end of turn 15); the stones return to 10 from turn 16. The stones tiebreak also covers the archers.
