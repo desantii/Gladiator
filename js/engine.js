@@ -1,4 +1,4 @@
-/* Gladiator v6.7 — rules engine. No DOM: talks to the outside through an `io` object:
+/* Gladiator v6.9 — rules engine. No DOM: talks to the outside through an `io` object:
  *   io.log(msg, cls)                 append to game log
  *   io.update()                      state changed, re-render
  *   io.delay(ms)                     pacing (Promise)
@@ -467,7 +467,8 @@
     /** Announce when a Gladiator's second Canis completes the pack. */
     notePack(p, before) {
       if (!RULES.packBonus || before >= 2 || this.packCount(p) !== 2) return;
-      this.log(`🐕🐕 ${p.name}'s war dogs form a pack! <b>Pack Hunt</b>: +${RULES.packBonus} damage that ignores armor.`, 'crit');
+      const lead = this.has(p, 'cerberus') ? 'Cerberus leads a war dog into' : 'two war dogs form';
+      this.log(`🐕🐕 ${p.name}: ${lead} a pack! <b>Pack Hunt</b>: +${RULES.packBonus} damage that ignores armor.`, 'crit');
       this.io.packFormed?.(p);
     }
 
@@ -817,7 +818,7 @@
         if (w.halfArmor) half = true;
       }
       if (ws.every((w) => !w.beast && !w.atk)) { normal += RULES.fists; parts.push('fists 10'); }
-      // Pack Hunt: two Canis add bonus damage that also ignores armor.
+      // Pack Hunt: two hounds (Canis or Cerberus) add bonus damage that also ignores armor.
       const pack = !!(RULES.packBonus && ws.filter((w) => w.pack).length === 2);
       if (pack) { ignore += RULES.packBonus; parts.push(`Pack Hunt +${RULES.packBonus}`); }
       if (a.glad.key === 'bestia') { normal += 10; parts.push('Bestia +10'); }

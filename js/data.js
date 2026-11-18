@@ -1,4 +1,4 @@
-/* Gladiator v6.7 — card data, taken from the rules manual (docs/rules-v6.7.md). */
+/* Gladiator v6.9 — card data, taken from the rules manual (docs/rules-v6.9.md). */
 (function (root) {
   'use strict';
 
@@ -38,7 +38,7 @@
     ursus: { name: 'Ursus', en: 'Bear', type: 'weapon', cat: 'weapon', beast: 8, hands: 1, buy: 50, sell: 25, count: 3, icon: '🐻', autoReduceOwn: 10,
       text: "Damage 8-48. Reduces auto-hit damage by 10." },
     canis: { name: 'Canis', en: 'War Dog', type: 'weapon', cat: 'weapon', beast: 5, hands: 1, buy: 45, sell: 25, count: 4, icon: '🐕', ignoreArmor: true, pack: true,
-      text: "Damage 5-30. Ignores armor. Pack Hunt: if both your weapons are Canis, add 20 damage. This damage also ignores armor." },
+      text: "Damage 5-30. Ignores armor. Pack Hunt: If using 2 hounds (Canis or Cerberus), add 20 damage that also ignores armor." },
 
     // ---------- Armor (37) ----------
     subarmalis: { name: 'Subarmalis', en: 'Padded Vest', type: 'armor', cat: 'armor', def: 20, loc: 'body', buy: 15, sell: 10, count: 7, icon: '🦺', text: "No special ability." },
@@ -74,8 +74,8 @@
       text: "Adds 2 to your dodge. Dodge cannot exceed 4." },
     hasta: { name: 'Hasta Achillis', en: 'Spear of Achilles', type: 'weapon', cat: 'legendary', legendary: true, atk: 60, hands: 1, sell: 50, count: 1, icon: '☄️', autoOn: 5,
       text: "Auto-hits on a roll of 5 or 6." },
-    cerberus: { name: 'Cerberus', en: 'Hound of Hades', type: 'weapon', cat: 'legendary', legendary: true, beast: 8, hands: 1, sell: 50, count: 1, icon: '🐺', ignoreArmor: true, dodgeMod: 1,
-      text: "Damage 8-48. Ignores armor. Reduces opponent's dodge by 1 for this attack." },
+    cerberus: { name: 'Cerberus', en: 'Hound of Hades', type: 'weapon', cat: 'legendary', legendary: true, beast: 8, hands: 1, sell: 50, count: 1, icon: '🐺', ignoreArmor: true, dodgeMod: 1, pack: true,
+      text: "Damage 8-48. Ignores armor. Reduces opponent's dodge by 1 for this attack. Pack Hunt: If using 2 hounds (Canis or Cerberus), add 20 damage that also ignores armor." },
   };
 
   // Attack deck (30), from the v6 card sheets.
@@ -161,7 +161,7 @@
     archerTurn: 15, // the Emperor's archers fire once
     archerDmg: 30,
     bribeCost: 30, // Bribe the Lanista
-    packBonus: 20, // Pack Hunt: two Canis equipped
+    packBonus: 20, // Pack Hunt: two hounds (Canis or Cerberus) equipped
     laurelsToWin: 3,      // up to 3 players
     laurelsToWinBig: 2,   // 4 or more players
     dodgeMin: 1,

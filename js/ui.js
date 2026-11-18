@@ -1,4 +1,4 @@
-/* Gladiator v6.7 — browser UI. */
+/* Gladiator v6.9 — browser UI. */
 (function () {
   'use strict';
   const { CARDS, GLADIATORS, RULES, ART } = window.GLAD_DATA;
@@ -195,7 +195,7 @@
       },
       async showPack(a, t) {
         if (!live()) return never();
-        stage(`<div class="pack-moment" role="img" aria-label="Pack Hunt"><div class="pack-dogs">${FACES.canis ? `<span class="dog left art" style="background-image:url('${esc(FACES.canis)}')"></span><span class="dog right art" style="background-image:url('${esc(FACES.canis)}')"></span>` : '<span class="dog left">🐕</span><span class="dog right">🐕</span>'}</div><div class="pack-title">PACK HUNT!</div><div class="why">${esc(a.name)}'s war dogs strike ${esc(t.name)}: +${RULES.packBonus} damage, armor ignored</div></div>`);
+        stage(`<div class="pack-moment" role="img" aria-label="Pack Hunt"><div class="pack-dogs">${(() => { const right = a.glad.equipped.some((c) => c.key === 'cerberus') ? 'cerberus' : 'canis'; return FACES.canis && FACES[right] ? `<span class="dog left art" style="background-image:url('${esc(FACES.canis)}')"></span><span class="dog right art ${right}" style="background-image:url('${esc(FACES[right])}')"></span>` : '<span class="dog left">🐕</span><span class="dog right">🐕</span>'; })()}</div><div class="pack-title">PACK HUNT!</div><div class="why">${esc(a.name)}'s hounds strike ${esc(t.name)}: +${RULES.packBonus} damage, armor ignored</div></div>`);
         $('stage').classList.remove('pack-flash'); void $('stage').offsetWidth; $('stage').classList.add('pack-flash');
         await wait(1400 * state.speed);
       },
@@ -492,7 +492,7 @@
   function showRules(back) {
     const box = openModal(`
       <div class="rules">
-      <h2>Rules of the Arena (v6.7)</h2>
+      <h2>Rules of the Arena (v6.9)</h2>
       <p><b>Goal.</b> Be the last Gladiator standing to win an arena and earn a laurel. The first player to 3 laurels is Champion; with 4 or more players, the first to 2.</p>
       <h4>Each turn</h4>
       <p><b>1. Equip Phase</b> (each player in turn order): collect <b>${RULES.income} denarii</b>; sell any cards for their printed sell value (50%); optionally pay <b>20</b> to refresh the 3-card Market (before drawing or buying); then <b>draw 1 free card OR buy up to 2</b> from the Market; finally arrange your equipment. It is locked until your next Equip Phase.</p>
@@ -510,7 +510,7 @@
       <table><tr><th>Gladiator</th><th>VITA</th><th>Dodge</th><th>Special</th></tr>
       ${Object.values(GLADIATORS).map((g) => `<tr><td>${g.icon} ${g.name}</td><td>${g.vita}</td><td>${g.dodge || 'never'}</td><td>${esc(g.text)}</td></tr>`).join('')}</table>
       <h4>Equipment</h4>
-      <p>Two weapon slots (main and off-hand). Two-handed weapons use both; shields use the off-hand. One armor piece per location. Specials and Legendaries are draw-only (never in the Market), and you may carry only 1 Legendary equipped. <b>Pack Hunt:</b> if both your weapons are Canis, add ${RULES.packBonus} damage; this damage also ignores armor.</p>
+      <p>Two weapon slots (main and off-hand). Two-handed weapons use both; shields use the off-hand. One armor piece per location. Specials and Legendaries are draw-only (never in the Market), and you may carry only 1 Legendary equipped. <b>Pack Hunt:</b> if using 2 hounds (Canis or Cerberus), add ${RULES.packBonus} damage that also ignores armor.</p>
       <table><tr><th>Card</th><th>Stats</th><th>Buy/Sell</th><th>Effect</th></tr>
       ${Object.values(CARDS).map((d) => `<tr><td>${d.icon} ${d.name}</td><td>${statLine(d)}</td><td>${d.buy || '—'}/${d.sell}</td><td>${esc(d.text)}</td></tr>`).join('')}</table>
       <h4>Notes on this digital edition</h4>

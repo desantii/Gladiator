@@ -2,7 +2,7 @@
 
 *A Card Game for 2-6 Players*
 
-V6.7
+V6.9
 
 **Welcome to the arena (Overview)**
 
@@ -92,7 +92,7 @@ players, 2 laurels with 4--6 players.
 7.  Set the twenty-sided die to 1 and place it in the middle of the
     table. This is the turn counter.
 
-8.  Each players rolls their die for turn order. If players tie, those
+8.  Each player rolls their die for turn order. If players tie, those
     players reroll.
 
 **Turn Structure**
@@ -152,7 +152,8 @@ phase.
 
 In turn order, each player with a surviving Gladiator draws one Attack
 Card and attacks the designated opponent. If your Gladiator is dead,
-draw a Hades card and resolve it.
+draw a Hades card and resolve it. The Attack deck has 30 cards: 9 Attack
+Left, 9 Attack Right, 6 Attack Your Choice and 6 Pass.
 
   -----------------------------------------------------------------------
   **Attack Card**               **Effect**
@@ -176,7 +177,8 @@ Before drawing your Attack card, you may pay 30 denarii to the Bank to
 attack a Gladiator of your choice instead. If you pay, do not draw an
 Attack card. You must decide before drawing: you cannot draw a card and
 then pay. Living Gladiators only; dead players always draw a Hades card.
-Does not apply in a 2-player game.
+Does not apply in a 2-player game. You cannot bribe when another effect
+already sets your target (Turned Blade, Fulgur Iovis).
 
 **Attacking**
 
@@ -189,7 +191,7 @@ Dodge range, but things they Equip can modify their Dodge range. If your
 roll is higher than the opponent's Dodge range, you will score a hit.
 
 **Important: a Gladiator\'s dodge range can never exceed 4 or drop below
-1, even with modifiers.**
+1, even with modifiers. Exception: Bestia never dodges.**
 
 To determine how much damage your attack does, add up the attack points
 of all of your weapons then subtract the total armor your opponent's
@@ -305,15 +307,30 @@ full, they pay what they have.
                                       is busy with its own business.
 
   Minor                               10 cards. A small guaranteed
-                                      effect: 5 damage, a 5-denarii toll,
-                                      a discarded card, a weaker roll or
-                                      armor for one attack.
+                                      effect, usually on one living
+                                      Gladiator of your choice: 5 damage,
+                                      a 5-denarii toll, a discarded card,
+                                      a weaker hit roll or dodge, 10 less
+                                      armor, no Market buys next Equip
+                                      Phase, or you choose the target of
+                                      their next attack. Two of them
+                                      (Light Fingers, Grave Wind) hit
+                                      every living Gladiator. See each
+                                      card for its exact effect.
 
-  Major                               10 cards. Five hit one Gladiator
-                                      hard (10 damage, 20 denarii, a lost
-                                      weapon). Five hit every living
-                                      Gladiator, but only if the Sacred
-                                      Coin lands Heads.
+  Major                               10 cards. Five hit one living
+                                      Gladiator of your choice hard: 10
+                                      damage, 20 denarii, a lost weapon,
+                                      an automatic miss, or no drawing,
+                                      buying or equipping next Equip
+                                      Phase. The other five flip the
+                                      Sacred Coin: on Heads they hit
+                                      every living Gladiator (20 damage,
+                                      30 denarii, discard your hand,
+                                      discard an equipped item, or no
+                                      dodging this Attack Phase); on
+                                      Tails nothing happens. See each
+                                      card for its exact effect.
   -----------------------------------------------------------------------
 
 **End of turn / end the arena**
@@ -377,6 +394,8 @@ some combinations are not viable.
 
 Two-handed weapons occupy both slots and cannot be paired with any other
 weapon. The total attack is the sum of all equipped weapon values.
+Weapon effects combine: a Pilum and a Sica together ignore the
+defender\'s shield, body and arm armor.
 
   -------------------------------------------------------------------------------------
   **Weapon**     **Attack**   **Buy**   **Sell**   **Special / Notes**
@@ -421,8 +440,8 @@ weapon. The total attack is the sum of all equipped weapon values.
                                                    auto-hit damage by 10.
 
   Canis (War     Die x 5      45        25         One-handed. Damage 5--30. Ignores
-  Dog)                                             armor. Pack Hunt: if both your
-                                                   weapons are Canis, add 20 damage.
+  Dog)                                             armor. Pack Hunt: if using 2 hounds
+                                                   (Canis or Cerberus), add 20 damage.
                                                    This damage also ignores armor.
   -------------------------------------------------------------------------------------
 
@@ -501,8 +520,9 @@ never raise a Gladiator above their starting VITA.
 **Legendary Items**
 
 These 6 legendary items are gifts from the gods and are draw only, like
-Special cards. They can be sold for 50 denarii. A Gladiator may carry a
-maximum of 1 Legendary item at a time, and there is only 1 copy of each.
+Special cards. They can be sold for 50 denarii. A Gladiator may have
+only 1 Legendary item equipped at a time (others may be held in hand),
+and there is only 1 copy of each.
 
   ---------------------------------------------------------------------------------
   **Legendary Items** **Type**      **Attack**   **Sell**   **Special**
@@ -566,4 +586,16 @@ maximum of 1 Legendary item at a time, and there is only 1 copy of each.
 +--------------------+-------------------------------------------------+
 | Dodge cap          | Dodge range is always between 1 and 4, even     |
 |                    | with modifiers.                                 |
++--------------------+-------------------------------------------------+
+| Laurels to win     | 3 laurels with 2--3 players, 2 laurels with     |
+|                    | 4--6 players.                                   |
++--------------------+-------------------------------------------------+
+| Bribe the Lanista  | Pay 30 denarii before drawing your Attack card  |
+|                    | to attack any Gladiator.                        |
++--------------------+-------------------------------------------------+
+| The Crowd          | From turn 11, every living Gladiator loses 10   |
+|                    | VITA each turn. Turn 15: archers, 30 instead.   |
++--------------------+-------------------------------------------------+
+| Pack Hunt          | Two hounds equipped (Canis or Cerberus): add 20 |
+|                    | damage that also ignores armor.                 |
 +--------------------+-------------------------------------------------+

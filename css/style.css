@@ -244,3 +244,7 @@ h3 .sub { text-transform: none; letter-spacing: 0; color: var(--muted); font-siz
 @media (prefers-reduced-motion: reduce) {
   .pack-dogs .dog, .pack-title, .stage.pack-flash { animation: none !important; }
 }
+/* Cerberus already faces left on its card, so it is not mirrored on the right-hand side. */
+.pack-dogs .dog.right.cerberus { transform: translateX(10%); animation: dog-right-plain .6s ease-out; background-size: 260% auto; background-position: 30% 33%; }
+@keyframes dog-right-plain { from { transform: translateX(200%); } to { transform: translateX(10%); } }
+@media (prefers-reduced-motion: reduce) { .pack-dogs .dog.right.cerberus { animation: none !important; } }
