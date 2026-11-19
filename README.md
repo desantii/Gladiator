@@ -35,7 +35,7 @@ Run the simulation with `node tests/simulate.js 300`.
 
 ## Since v6.4
 
-These playtest changes are in the v6.9 manual and the game: laurels to win (3 with 2–3 players, 2 with 4–6), Gladius 8 / Sica 4 / Pugio 6 / Canis 4, Scutum 45/25, Lorica Segmentata 70/35, Invictus dodge 2, and Pack Hunt (two hounds, Canis or Cerberus, add 20 damage that ignores armor). The card art matches, except that the Cerberus card does not yet mention Pack Hunt.
+These playtest changes are in the v6.9 manual and the game: laurels to win (3 with 2–3 players, 2 with 4–6), Gladius 8 / Sica 4 / Pugio 6 / Canis 4, Scutum 45/25, Lorica Segmentata 70/35, Invictus dodge 2, and Pack Hunt (two hounds, Canis or Cerberus, add 20 damage that ignores armor). The card art matches; the Pack Hunt rule is printed on the Canis card, which names Cerberus as a hound.
 
 ## Interpretations
 
